@@ -1,59 +1,59 @@
 import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.*;
 
+
 public class Worms extends BasicGame {
 
 	public Worms() {
-        super("Leçon 1 :: Worms");
+        super("Worms");
     }
 	
 	private GameContainer container;
 	private TiledMap map;
+	private Player player1 = new Player("Alex");
+	private Player player2 = new Player("Tom");
 	private static int dimX=1440;
 	private static int dimY=800;
 	private int ysol=384;
-	private float x = 200, y =dimY-ysol;
-	private Animation[] animations;
-	private int direction = 0;
-	private boolean moving = false;
+	private ControlPlayer controller = new ControlPlayer(this.player1);
 
-    public void init(GameContainer container) throws SlickException {
+     public void init(GameContainer container) throws SlickException {
     	this.container=container;
+    	this.player1.init();
+    	this.player2.init();
     	this.map= new TiledMap("src/main/ressources/map/map.tmx");
+    	//ControlPlayer controller = new ControlPlayer(this.player);
+    	container.getInput().addKeyListener(controller);
     	
-    	SpriteSheet spriteSheet = new SpriteSheet("src/Spritesheets/spritesheet_players.png", 128, 256);
-    	animations=new Animation[11];
-    	for (int i=0;i<11;i++) {
-    		animations[i]=new Animation();
-    	}
-        animations[0].addFrame(spriteSheet.getSprite(0, 0), 1000);
-        animations[1].addFrame(spriteSheet.getSprite(1, 0), 1000);
-        animations[2].addFrame(spriteSheet.getSprite(0, 1), 1000);
-        animations[3].addFrame(spriteSheet.getSprite(1, 1), 1000);
-        animations[4].addFrame(spriteSheet.getSprite(0, 2), 1000);
-        animations[5].addFrame(spriteSheet.getSprite(1, 2), 1000);
-        animations[6].addFrame(spriteSheet.getSprite(0, 3), 1000);
-        animations[7].addFrame(spriteSheet.getSprite(0, 4), 1000);
-        animations[8].addFrame(spriteSheet.getSprite(0, 5), 1000);
-        animations[9].addFrame(spriteSheet.getSprite(0, 6), 1000);
-        animations[10].addFrame(spriteSheet.getSprite(0, 7), 1000);
     }
     
 
     public void render(GameContainer container, Graphics g) throws SlickException {
     	this.map.render(0,0);
-    	g.drawAnimation(animations[direction + (moving ? 4 : 0)], x, y-256);
+    	this.player1.render(g);
+    	this.player2.render(g);
     }
 
     public void update(GameContainer container, int delta) throws SlickException {
+    	this.player1.update(delta);
+    //	this.player2.update(delta);
+    	
     }
     
+
+    @Override
     public void keyReleased(int key, char c) {
-        if (Input.KEY_ESCAPE==key) {
-            container.exit();
-        }
+    	controller.keyReleased(key, c);
+		if (Input.KEY_ESCAPE == key) {
+			this.container.exit();
+		}
     }
-	
+    
+    @Override
+    public void keyPressed(int key, char c) {
+    	controller.keyPressed(key, c);
+    }
+    
     public static void main(String[] args) throws SlickException {
     	new AppGameContainer(new Worms(), dimX, dimY, false).start();
     }
