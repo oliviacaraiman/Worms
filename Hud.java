@@ -25,11 +25,7 @@ public class Hud {
 		Y_BARRE=Y_IMAGE+8;
 		HEIGHT_BARRE=16;
 		WIDTH_MAX_BARRE=232;
-		
-	}
-	
-	public void init() throws SlickException {
-		contourBarre=new Image("Vie/enemy_health_bar_foreground_000.png");
+		contourBarre=new Image("src/main/ressources/Vie/enemy_health_bar_foreground_000.png");
 	}
 	
 	public void render(Graphics g,float fr) {
