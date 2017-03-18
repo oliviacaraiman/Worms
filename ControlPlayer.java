@@ -25,6 +25,7 @@ public class ControlPlayer implements KeyListener {
 		switch (key) {
         case Input.KEY_UP:   
         	player.setDy(-1);
+        	player.setJumping(true);
 			break;
 		case Input.KEY_LEFT:
 			player.setDx(-1);

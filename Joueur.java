@@ -12,10 +12,18 @@ public class Joueur {
 	private float X_BEGIN,Y_BEGIN;
 	private float dx,dy;
 	private int direction;
-	private boolean moving;
+	private boolean jumping;
 	
+	//concerne le deplacement du personnage
+	private final int JUMP_HEIGHT = 200;
+	private final int BASE_LINE = 416;
+	private Boolean stillJumping = false;
+	private Boolean goingUp = false;
+	private Boolean goingDown = false;
+	private int highestPoint = 10000;
 	private final float LARGEUR_PERSO;
 	private final float HAUTEUR_PERSO;
+	
 	//concerne l'affichage de la vie sur la carte
 	private Hud hud;
 	private final float LIFE_MAX;
@@ -28,7 +36,7 @@ public class Joueur {
 		this.map=map;
 		LIFE_MAX=100;
 		life=LIFE_MAX;
-		moving=false;
+		jumping=false;
 		dx=0;
 		dy=0;
 		
@@ -37,7 +45,8 @@ public class Joueur {
 		LARGEUR_PERSO=128;
 		HAUTEUR_PERSO=256;
 		X_BEGIN=100+(num-1)*(this.map.getWidth()-200-LARGEUR_PERSO); //200 pour l'écart au bord
-		Y_BEGIN=map.f(X_BEGIN);//hauteur du sol
+		//Y_BEGIN=map.f(Y_BEGIN);//hauteur du sol
+		Y_BEGIN = 416;
 		xPerso=X_BEGIN;
 		yPerso=Y_BEGIN;
         
@@ -78,27 +87,62 @@ public class Joueur {
 	}
 	
 	public void update(int delta) throws SlickException {
-		// mouvement du personnage
+		// gerer le saut
+		float gravity = -1.5f;
+		double counter = 0;
 		if (this.isMoving()) {
 			updateDirection();
-			float futurX=this.xPerso + .3f * delta * dx;
-			float futurY=this.yPerso + .3f * delta * dy;
-			//conditions de sortie d'écran
-			if(futurX<0) {
-				futurX=0;
+			this.xPerso = this.xPerso + .3f * delta * dx;
+			if(this.yPerso>BASE_LINE){
+				this.yPerso = BASE_LINE;
+			} else{
+			this.yPerso = this.yPerso + .3f * delta * dy;
 			}
-			if(futurY<HAUTEUR_PERSO/2) {
-				futurY=HAUTEUR_PERSO/2;
+			
+		}
+		if (jumping || goingUp || goingDown) {
+			if (this.yPerso < highestPoint || goingUp) {
+				goingUp = true;
+				highestPoint = (int) this.yPerso;
+				this.dy = gravity * delta;
 			}
-			if(futurX>map.getWidth()-LARGEUR_PERSO) {
-				futurX=map.getWidth()-LARGEUR_PERSO;
+
+			if (highestPoint < JUMP_HEIGHT || goingDown) {
+				goingUp = false;
+				goingDown = true;
+				this.dy = -gravity * delta;
 			}
-			if(!map.collision(futurX,futurY)) { //en cours d'écriture, on peut mettre contact pour l'instant
-				this.xPerso = futurX;
-				this.yPerso = futurY;
+			
+			if (this.yPerso >= BASE_LINE) {
+				goingDown = false;
+				goingUp = false;
+				this.jumping = false;
+				highestPoint = 10000;
+				this.dy = 0;
 			}
 		}
 	}
+			
+			
+			//j'ai commente cette partie parce que ca marchait pas 
+//			float futurX=this.xPerso + .3f * delta * dx;
+//			float futurY=this.yPerso + .3f * delta * dy;
+//			//conditions de sortie d'écran
+//			if(futurX<0) {
+//				futurX=0;
+//			}
+//			if(futurY<HAUTEUR_PERSO/2) {
+//				futurY=HAUTEUR_PERSO/2;
+//			}
+//			if(futurX>map.getWidth()-LARGEUR_PERSO) {
+//				futurX=map.getWidth()-LARGEUR_PERSO;
+//			}
+//			if(!map.collision(futurX,futurY)) { //en cours d'écriture, on peut mettre contact pour l'instant
+//				this.xPerso = futurX;
+//				this.yPerso = futurY;
+//			}
+//		}
+//	}
 	
 	private void updateDirection() {
 		if (dx > 0 && dx >= Math.abs(dy)) {
@@ -127,18 +171,19 @@ public class Joueur {
 		return direction;
 	}
 	
-	public boolean getMoving() {
-		return moving;
-	}
-	
+		
 	
 	public boolean isMoving() {
-		return dx != 0 || dy != 0;
+		return dx != 0 || dy != 0 || jumping == true;
 	}
 	
 	public void stopMoving() {
 		dx = 0;
 		dy = 0;
+	}
+	
+	public void setJumping(boolean j) {
+		this.jumping = j;
 	}
 	
 	public float getX() {
@@ -163,6 +208,10 @@ public class Joueur {
 
 	public void setDy(float dy) {
 		this.dy = dy;
+	}
+	
+	public boolean isJumping() {
+		return jumping;
 	}
 
 	public Animation[] getAnimations() {
