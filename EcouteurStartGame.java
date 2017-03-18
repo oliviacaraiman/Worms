@@ -9,7 +9,7 @@ public class EcouteurStartGame implements ActionListener{
 		}
 	
 	public void actionPerformed (ActionEvent e) {
-		FenetreCredits w = new FenetreCredits();
+		Womrs w = new Worms();
 	}
 }
 
