@@ -1,4 +1,5 @@
 import java.lang.*;
+import java.util.*;
 
 
 public class Grenade {
@@ -6,7 +7,8 @@ public class Grenade {
 	private double angle ;
 	private double force ;
 	private double g ;
-	private double[] traj=new double[10000] ;
+	private ArrayList traj = new ArrayList() ;
+	private double[] tabTraj ;
 	private double x ;
 	private double y ;
 
@@ -20,31 +22,33 @@ public class Grenade {
 		angle = a ;
 		force = f ;
 		
-		x=0 ;
-		y=0;
-		int i=0 ;
-
-		while(y >= 0.0) {
-			y = ((-0.5*10)/(force*force))*(x*x)*(1 + (Math.tan(angle))*(Math.tan(angle))) + x*Math.tan(angle) ;
-			traj[i] = y ;
-			x++ ;
+		x=0.5;
+		y =((-10*Math.pow(x,2))/(2*Math.pow(force,2)))*(1+Math.pow(Math.tan(angle),2)) + x*Math.tan(angle);
+		traj.add(y);
+		x=x+0.5;
+		int i =1;
+		while(y > 0.0) {
+			y =((-10*Math.pow(x,2))/(2*Math.pow(force,2)))*(1+Math.pow(Math.tan(angle),2)) + x*Math.tan(angle);
+			traj.add(y);
+			x=x+0.5;
 			i++ ;
-	
 		}
-
-		return traj ;
+		
+		tabTraj=new double[traj.size()];
+		for (int j=0;j<tabTraj.length;j++) {
+			tabTraj[j]=(double)(traj.get(j));
+		}
+		return tabTraj ;
 		
 	}
 	
 	
 	public String toString() {
 		String s = "" ;
-		for(int i=0; i<traj.length; i++) {
-			s = s + traj[i] + " | ";
+		for(int i=0; i<tabTraj.length; i++) {
+			s = s + tabTraj[i] + " | ";
 		}
-		
 		return "Le tableau de la trajectoire est : " + s ;
-		
 	}
 			
 
