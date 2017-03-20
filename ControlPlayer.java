@@ -7,6 +7,10 @@ public class ControlPlayer implements KeyListener {
 	public ControlPlayer(Joueur player){
 		this.player = player;
 	}
+	
+	public void setJoueurCourant(Joueur player) {
+		this.player=player;
+	}
 
 	public void inputEnded() {
 	}
@@ -25,7 +29,6 @@ public class ControlPlayer implements KeyListener {
 		switch (key) {
         case Input.KEY_UP:   
         	player.setDy(-1);
-        	player.setJumping(true);
 			break;
 		case Input.KEY_LEFT:
 			player.setDx(-1);
@@ -35,6 +38,12 @@ public class ControlPlayer implements KeyListener {
 			break;
 		case Input.KEY_RIGHT:
 			player.setDx(1);
+			break;
+		case Input.KEY_M: //pour tester la diminution de la vie
+			player.setVie(player.getVie()-10);
+			break;
+		case Input.KEY_D: //pour tester la destruction du décor
+			player.destroy(10,68);
 			break;
 		}
 	}

@@ -5,6 +5,7 @@ public class Joueur {
 	//concerne la signature du personnage
 	private String nom;
 	private static int num=1;
+	private int numeroJoueur;
 	//concerne le placement du personnage sur la carte
 	private Map map;
 	private Animation[] animations;
@@ -12,18 +13,10 @@ public class Joueur {
 	private float X_BEGIN,Y_BEGIN;
 	private float dx,dy;
 	private int direction;
-	private boolean jumping;
+	private boolean moving;
 	
-	//concerne le deplacement du personnage
-	private final int JUMP_HEIGHT = 200;
-	private final int BASE_LINE = 416;
-	private Boolean stillJumping = false;
-	private Boolean goingUp = false;
-	private Boolean goingDown = false;
-	private int highestPoint = 10000;
 	private final float LARGEUR_PERSO;
 	private final float HAUTEUR_PERSO;
-	
 	//concerne l'affichage de la vie sur la carte
 	private Hud hud;
 	private final float LIFE_MAX;
@@ -36,113 +29,92 @@ public class Joueur {
 		this.map=map;
 		LIFE_MAX=100;
 		life=LIFE_MAX;
-		jumping=false;
+		moving=false;
 		dx=0;
 		dy=0;
 		
 		//différence entre les deux personnages
 		direction=2*(num-1);
-		LARGEUR_PERSO=128;
-		HAUTEUR_PERSO=256;
+		LARGEUR_PERSO=64;
+		HAUTEUR_PERSO=128;
 		X_BEGIN=100+(num-1)*(this.map.getWidth()-200-LARGEUR_PERSO); //200 pour l'écart au bord
-		//Y_BEGIN=map.f(Y_BEGIN);//hauteur du sol
-		Y_BEGIN = 416;
+		Y_BEGIN=map.f(X_BEGIN);//hauteur du sol
 		xPerso=X_BEGIN;
 		yPerso=Y_BEGIN;
         
         //Création du HUD
-        hud=new Hud(num,this.map.getWidth(),this.map.getHeight(),nom);
+        hud=new Hud(num,this.map.getWidth(),nom);
         
         //Augmentation du numéro du joueur
+        numeroJoueur=num;
 		num++;
 	}
 	
 	public void init() throws SlickException {//Chargement des animations
-		SpriteSheet spriteSheet = new SpriteSheet("src/main/ressources/Spritesheets/spritesheet_players.png",(int)LARGEUR_PERSO,(int)HAUTEUR_PERSO);
-		animations=new Animation[11];
-		for (int i=0;i<11;i++) {
+		SpriteSheet face=null;
+		SpriteSheet marcheGauche0=null;
+		SpriteSheet marcheGauche1=null;
+		SpriteSheet marcheDroite0=null;
+		SpriteSheet marcheDroite1=null;
+		SpriteSheet sautGauche=null;
+		SpriteSheet sautDroite=null;
+		try {
+			face = new SpriteSheet("src/main/ressources/PNG/Players/64x128/"+numeroJoueur+"/"+numeroJoueur+"_front.png",(int)LARGEUR_PERSO,(int)HAUTEUR_PERSO);
+			marcheGauche0 = new SpriteSheet("src/main/ressources/PNG/Players/64x128/"+numeroJoueur+"/"+numeroJoueur+"_walk1_0.png",(int)LARGEUR_PERSO,(int)HAUTEUR_PERSO);
+			marcheGauche1 = new SpriteSheet("src/main/ressources/PNG/Players/64x128/"+numeroJoueur+"/"+numeroJoueur+"_walk2_0.png",(int)LARGEUR_PERSO,(int)HAUTEUR_PERSO);
+			marcheDroite0 = new SpriteSheet("src/main/ressources/PNG/Players/64x128/"+numeroJoueur+"/"+numeroJoueur+"_walk1_1.png",(int)LARGEUR_PERSO,(int)HAUTEUR_PERSO);
+			marcheDroite1 = new SpriteSheet("src/main/ressources/PNG/Players/64x128/"+numeroJoueur+"/"+numeroJoueur+"_walk2_1.png",(int)LARGEUR_PERSO,(int)HAUTEUR_PERSO);
+			sautGauche = new SpriteSheet("src/main/ressources/PNG/Players/64x128/"+numeroJoueur+"/"+numeroJoueur+"_jump_0.png",(int)LARGEUR_PERSO,(int)HAUTEUR_PERSO);
+			sautDroite = new SpriteSheet("src/main/ressources/PNG/Players/64x128/"+numeroJoueur+"/"+numeroJoueur+"_jump_1.png",(int)LARGEUR_PERSO,(int)HAUTEUR_PERSO);
+		} catch (Exception e) {
+			
+		}
+		animations=new Animation[5];
+		for (int i=0;i<5;i++) {
     		animations[i]=new Animation();
     	}
-        animations[0].addFrame(spriteSheet.getSprite(0, 0), 1000);
-        animations[1].addFrame(spriteSheet.getSprite(1, 0), 1000);
-        animations[2].addFrame(spriteSheet.getSprite(0, 1), 1000);
-        animations[3].addFrame(spriteSheet.getSprite(1, 1), 1000);
-        animations[4].addFrame(spriteSheet.getSprite(0, 2), 1000);
-        animations[5].addFrame(spriteSheet.getSprite(1, 2), 1000);
-        animations[6].addFrame(spriteSheet.getSprite(0, 3), 1000);
-        animations[7].addFrame(spriteSheet.getSprite(0, 4), 1000);
-        animations[8].addFrame(spriteSheet.getSprite(0, 5), 1000);
-        animations[9].addFrame(spriteSheet.getSprite(0, 6), 1000);
-        animations[10].addFrame(spriteSheet.getSprite(0, 7), 1000);
+        animations[0].addFrame(face.getSprite(0, 0), 150); //face
+        animations[1].addFrame(marcheGauche0.getSprite(0, 0), 150); //marche gauche
+        animations[1].addFrame(marcheGauche1.getSprite(0, 0), 150);
+        animations[2].addFrame(marcheDroite0.getSprite(0, 0), 150); //marche droite
+        animations[2].addFrame(marcheDroite1.getSprite(0, 0), 150);
+        animations[3].addFrame(sautGauche.getSprite(0, 0), 150); //saut gauche
+        animations[4].addFrame(sautDroite.getSprite(0, 0), 150); //saut droite
 	}
 	
 	public void render(Graphics g) throws SlickException {
 		// ombre personnage
 		g.setColor(new Color(0, 0, 0, .5f));
-		g.fillOval(xPerso + 19, yPerso - 8, 90, 16);
+		g.fillOval(xPerso + 10, yPerso - 4, 45, 8);
 		// dessin du personnage animé
-		g.drawAnimation(animations[direction + (isMoving() ? 4 : 0)], xPerso, yPerso-HAUTEUR_PERSO); //256 correspond à la hauteur du frame
+		g.drawAnimation(animations[(isMoving() ? 1+(int)direction/2: 0)/*+(isJumping() ? 2:0)*/], xPerso, yPerso-HAUTEUR_PERSO); //256 correspond à la hauteur du frame
 		//dessin de la barre de vie
-		hud.render(g,this.getPourcentVie());
+		hud.paintComponent(g,this.getPourcentVie());
 	}
 	
 	public void update(int delta) throws SlickException {
-		// gerer le saut
-		float gravity = -1.5f;
-		double counter = 0;
+		// mouvement du personnage
 		if (this.isMoving()) {
 			updateDirection();
-			this.xPerso = this.xPerso + .3f * delta * dx;
-			if(this.yPerso>BASE_LINE){
-				this.yPerso = BASE_LINE;
-			} else{
-			this.yPerso = this.yPerso + .3f * delta * dy;
+			float futurX=this.xPerso + .3f * delta * dx;
+			float futurY=this.yPerso + .3f * delta * dy;
+			//conditions de sortie d'écran
+			if(futurX<0) {
+				futurX=0;
 			}
-			
-		}
-		if (jumping || goingUp || goingDown) {
-			if (this.yPerso < highestPoint || goingUp) {
-				goingUp = true;
-				highestPoint = (int) this.yPerso;
-				this.dy = gravity * delta;
+			if(futurY<HAUTEUR_PERSO/2) {
+				futurY=HAUTEUR_PERSO/2;
 			}
-
-			if (highestPoint < JUMP_HEIGHT || goingDown) {
-				goingUp = false;
-				goingDown = true;
-				this.dy = -gravity * delta;
+			if(futurX>map.getWidth()-LARGEUR_PERSO) {
+				futurX=map.getWidth()-LARGEUR_PERSO;
 			}
-			
-			if (this.yPerso >= BASE_LINE) {
-				goingDown = false;
-				goingUp = false;
-				this.jumping = false;
-				highestPoint = 10000;
-				this.dy = 0;
+			if(!map.collision(futurX+LARGEUR_PERSO/2,futurY-map.getHeightTile())) { //en cours d'écriture, on peut mettre contact pour l'instant
+				this.xPerso = futurX;
+				this.yPerso = futurY;
 			}
 		}
+		//hud.update(this.getPourcentVie());
 	}
-			
-			
-			//j'ai commente cette partie parce que ca marchait pas 
-//			float futurX=this.xPerso + .3f * delta * dx;
-//			float futurY=this.yPerso + .3f * delta * dy;
-//			//conditions de sortie d'écran
-//			if(futurX<0) {
-//				futurX=0;
-//			}
-//			if(futurY<HAUTEUR_PERSO/2) {
-//				futurY=HAUTEUR_PERSO/2;
-//			}
-//			if(futurX>map.getWidth()-LARGEUR_PERSO) {
-//				futurX=map.getWidth()-LARGEUR_PERSO;
-//			}
-//			if(!map.collision(futurX,futurY)) { //en cours d'écriture, on peut mettre contact pour l'instant
-//				this.xPerso = futurX;
-//				this.yPerso = futurY;
-//			}
-//		}
-//	}
 	
 	private void updateDirection() {
 		if (dx > 0 && dx >= Math.abs(dy)) {
@@ -171,19 +143,17 @@ public class Joueur {
 		return direction;
 	}
 	
-		
+	public boolean getMoving() {
+		return moving;
+	}
 	
 	public boolean isMoving() {
-		return dx != 0 || dy != 0 || jumping == true;
+		return dx != 0 || dy != 0;
 	}
 	
 	public void stopMoving() {
 		dx = 0;
 		dy = 0;
-	}
-	
-	public void setJumping(boolean j) {
-		this.jumping = j;
 	}
 	
 	public float getX() {
@@ -209,10 +179,6 @@ public class Joueur {
 	public void setDy(float dy) {
 		this.dy = dy;
 	}
-	
-	public boolean isJumping() {
-		return jumping;
-	}
 
 	public Animation[] getAnimations() {
 		return animations;
@@ -222,7 +188,23 @@ public class Joueur {
 		return nom;
 	}
 	
+	public void setVie(float v) {
+		life=v;
+	}
+	
+	public float getVie() {
+		return life;
+	}
+	
 	public float getPourcentVie() {
     	return life/LIFE_MAX;
     }
+	
+	public void destroy(int x, int y) {
+		map.destroy(x,y,this);
+	}
+	
+	public float getWidth() {
+		return LARGEUR_PERSO;
+	}
 }

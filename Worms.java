@@ -9,6 +9,7 @@ public class Worms extends BasicGame {
 
 	private Joueur j1;
 	private Joueur j2;
+	private Joueur jCourant;
 	private ControlPlayer controller;
 	
 	public Worms() {
@@ -21,9 +22,10 @@ public class Worms extends BasicGame {
     	map=new Map();
     	j1=new Joueur("Albert",map);
     	j2=new Joueur("Anna",map);
+    	jCourant=j1;
     	j1.init();
     	j2.init();
-    	controller = new ControlPlayer(j1);
+    	controller = new ControlPlayer(jCourant);
     	container.getInput().addKeyListener(controller);
     }
     
@@ -35,12 +37,24 @@ public class Worms extends BasicGame {
     }
 
     public void update(GameContainer container, int delta) throws SlickException {
-    	j1.update(delta);
+    	jCourant.update(delta);
+    }
+    
+    public void changeJoueurCourant() {
+    	if(jCourant.equals(j1)) {
+    		jCourant=j2;
+    	} else {
+    		jCourant=j1;
+    	}
+    	controller.setJoueurCourant(jCourant);
     }
     
     public void keyReleased(int key, char c) {
     	controller.keyReleased(key, c);
-        if (Input.KEY_ESCAPE==key) {
+    	if (Input.KEY_ENTER==key) {
+    		jCourant.stopMoving();
+    		this.changeJoueurCourant();
+    	} else if (Input.KEY_ESCAPE==key) {
             container.exit();
         }
     }
