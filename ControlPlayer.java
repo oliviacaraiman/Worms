@@ -43,7 +43,9 @@ public class ControlPlayer implements KeyListener {
 			player.setVie(player.getVie()-10);
 			break;
 		case Input.KEY_D: //pour tester la destruction du décor
-			player.destroy(10,68);
+			float[] dest={0,0};
+			dest=player.lancerGrenade(0.5f, 75f);
+			player.destroy((int)dest[0],(int)dest[1]);
 			break;
 		}
 	}

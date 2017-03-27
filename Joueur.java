@@ -1,4 +1,5 @@
 import org.newdawn.slick.*;
+import java.util.*;
 
 public class Joueur {
 
@@ -21,6 +22,8 @@ public class Joueur {
 	private Hud hud;
 	private final float LIFE_MAX;
 	private float life;
+	
+	private Grenade gr;
 
 	
 	public Joueur(String nom,Map map) throws SlickException {
@@ -37,20 +40,21 @@ public class Joueur {
 		direction=2*(num-1);
 		LARGEUR_PERSO=64;
 		HAUTEUR_PERSO=128;
-		X_BEGIN=100+(num-1)*(this.map.getWidth()-200-LARGEUR_PERSO); //200 pour l'écart au bord
-		Y_BEGIN=map.f(X_BEGIN);//hauteur du sol
+		X_BEGIN=200+(num-1)*(this.map.getWidth()-400-LARGEUR_PERSO); //200 pour l'écart au bord
+		Y_BEGIN=map.f(X_BEGIN+LARGEUR_PERSO/2);//hauteur du sol
 		xPerso=X_BEGIN;
 		yPerso=Y_BEGIN;
         
-        //Création du HUD
+        //Création du HUD et de la grenade;
         hud=new Hud(num,this.map.getWidth(),nom);
+        gr=new Grenade();
         
         //Augmentation du numéro du joueur
         numeroJoueur=num;
 		num++;
 	}
 	
-	public void init() throws SlickException {//Chargement des animations
+	public void init() {//Chargement des animations
 		SpriteSheet face=null;
 		SpriteSheet marcheGauche0=null;
 		SpriteSheet marcheGauche1=null;
@@ -82,7 +86,7 @@ public class Joueur {
         animations[4].addFrame(sautDroite.getSprite(0, 0), 150); //saut droite
 	}
 	
-	public void render(Graphics g) throws SlickException {
+	public void render(Graphics g) {
 		// ombre personnage
 		g.setColor(new Color(0, 0, 0, .5f));
 		g.fillOval(xPerso + 10, yPerso - 4, 45, 8);
@@ -90,9 +94,10 @@ public class Joueur {
 		g.drawAnimation(animations[(isMoving() ? 1+(int)direction/2: 0)/*+(isJumping() ? 2:0)*/], xPerso, yPerso-HAUTEUR_PERSO); //256 correspond à la hauteur du frame
 		//dessin de la barre de vie
 		hud.paintComponent(g,this.getPourcentVie());
+		gr.paintComponent();
 	}
 	
-	public void update(int delta) throws SlickException {
+	public void update(int delta) {
 		// mouvement du personnage
 		if (this.isMoving()) {
 			updateDirection();
@@ -108,12 +113,14 @@ public class Joueur {
 			if(futurX>map.getWidth()-LARGEUR_PERSO) {
 				futurX=map.getWidth()-LARGEUR_PERSO;
 			}
+			if(futurY>map.getHeight()) {
+				futurY=map.getHeight();
+			}
 			if(!map.collision(futurX+LARGEUR_PERSO/2,futurY-map.getHeightTile())) { //en cours d'écriture, on peut mettre contact pour l'instant
 				this.xPerso = futurX;
 				this.yPerso = futurY;
 			}
 		}
-		//hud.update(this.getPourcentVie());
 	}
 	
 	private void updateDirection() {
@@ -206,5 +213,39 @@ public class Joueur {
 	
 	public float getWidth() {
 		return LARGEUR_PERSO;
+	}
+	
+	public float getHeight() {
+		return HAUTEUR_PERSO;
+	}
+	
+	public float[] lancerGrenade(float a, float f) { //attention, diminution de y vers le haut, donc force<0 et g>0 et - devant la tangente
+		float angle = a ;
+		float force = -f ;
+		float pas=8f;
+		ArrayList<Float> traj=new ArrayList<Float>();
+		
+		float x0=(float)(xPerso+LARGEUR_PERSO/2);//valeur de départ de x
+		float y0=(float)(yPerso-LARGEUR_PERSO/4);//valeur de départ de y, au milieu du corps du perso
+		gr.setPosition(x0,y0);
+		gr.setIsThere(true);
+		
+		traj.add(yPerso); //première valeur de y
+		float x=(float)(x0+pas);
+		float y =(float)(((10*Math.pow(x-x0,2))/(2*Math.pow(force,2)))*(1+Math.pow(Math.tan(angle),2)) - (x-x0)*Math.tan(angle)+y0); //1ere itération
+		while(x>pas && x<map.getWidth()-pas && y>pas && y<map.getHeight()-pas && !map.collision(x, y)) { //ne pas faire les tests si sortie d'écran
+			traj.add(y);//ajout du précédent
+			x=(float)(x+pas);
+			y =(float)(((10*Math.pow(x-x0,2))/(2*Math.pow(force,2)))*(1+Math.pow(Math.tan(angle),2)) - (x-x0)*Math.tan(angle)+y0);
+			gr.setPosition(x,y);
+		}
+		
+		float[] tabTraj=new float[traj.size()]; //tableau provisoire, ensuite on affichera les grenades
+		for (int j=0;j<tabTraj.length;j++) {
+			tabTraj[j]=(float)(traj.get(j));
+		}
+		
+		float[] finale={(int)x/map.getWidthTile(),(int)(y+1)/map.getWidthTile()}; //+1 car on s'arrête juste avant l'entier
+		return finale;	
 	}
 }

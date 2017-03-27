@@ -13,9 +13,7 @@ public class Hud {
 	private final int xDim;
 	private final int num;
 	
-	private Graphics graph;
-	
-	public Hud(int nume, int xDimen, String name) throws SlickException {
+	public Hud(int nume, int xDimen, String name) {
 		num=nume;
 		nom=name;
 		xDim=xDimen;
@@ -34,13 +32,12 @@ public class Hud {
 	
 	public void paintComponent(Graphics g,float fr) {
 		//dessin de la barre de vie
-		graph=g;
-		graph.setColor(Color.red);
-		graph.fillRect(X_BARRE,Y_BARRE,Math.max(0,fr*WIDTH_MAX_BARRE),HEIGHT_BARRE);
-		graph.drawImage(contourBarre, X_IMAGE,Y_IMAGE);
+		g.setColor(Color.red);
+		g.fillRect(X_BARRE,Y_BARRE,Math.max(0,fr*WIDTH_MAX_BARRE),HEIGHT_BARRE);
+		g.drawImage(contourBarre, X_IMAGE,Y_IMAGE);
 		
 		//dessin du nom
-		graph.setColor(Color.black);
-		graph.drawString(nom, X_IMAGE, Y_IMAGE+50);
+		g.setColor(Color.black);
+		g.drawString(nom, X_IMAGE, Y_IMAGE+50);
 	}
 }

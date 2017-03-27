@@ -11,6 +11,7 @@ public class Worms extends BasicGame {
 	private Joueur j2;
 	private Joueur jCourant;
 	private ControlPlayer controller;
+	private TextNextTurn tnt;
 	
 	public Worms() {
         super("Worms");
@@ -27,13 +28,15 @@ public class Worms extends BasicGame {
     	j2.init();
     	controller = new ControlPlayer(jCourant);
     	container.getInput().addKeyListener(controller);
+    	tnt=new TextNextTurn(dimX/2,dimY/4,j1);
     }
     
 
     public void render(GameContainer container, Graphics g) throws SlickException {
-    	map.render(0, 0, 0);
+    	map.render(0, 0);
     	j1.render(g);
     	j2.render(g);
+    	tnt.paintComponent(g);
     }
 
     public void update(GameContainer container, int delta) throws SlickException {
@@ -54,6 +57,7 @@ public class Worms extends BasicGame {
     	if (Input.KEY_ENTER==key) {
     		jCourant.stopMoving();
     		this.changeJoueurCourant();
+    		tnt.setIsThere(true,jCourant);
     	} else if (Input.KEY_ESCAPE==key) {
             container.exit();
         }

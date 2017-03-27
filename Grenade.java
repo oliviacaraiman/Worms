@@ -1,57 +1,36 @@
-import java.lang.*;
-import java.util.*;
-
+import org.newdawn.slick.*;
 
 public class Grenade {
 	
-	private double angle ;
-	private double force ;
-	private double g ;
-	private ArrayList traj = new ArrayList() ;
-	private double[] tabTraj ;
-	private double x ;
-	private double y ;
-
-
+	private Image grenade;
+	private float xPosition;
+	private float yPosition;
+	private boolean isThere;
+	
 	public Grenade() {
-	}
-	
-
-	public double[] lancerGrenade(double a, double f) {
-		
-		angle = a ;
-		force = f ;
-		
-		x=0.5;
-		y =((-10*Math.pow(x,2))/(2*Math.pow(force,2)))*(1+Math.pow(Math.tan(angle),2)) + x*Math.tan(angle);
-		traj.add(y);
-		x=x+0.5;
-		int i =1;
-		while(y > 0.0) {
-			y =((-10*Math.pow(x,2))/(2*Math.pow(force,2)))*(1+Math.pow(Math.tan(angle),2)) + x*Math.tan(angle);
-			traj.add(y);
-			x=x+0.5;
-			i++ ;
-		}
-		
-		tabTraj=new double[traj.size()];
-		for (int j=0;j<tabTraj.length;j++) {
-			tabTraj[j]=(double)(traj.get(j));
-		}
-		return tabTraj ;
-		
-	}
-	
-	
-	public String toString() {
-		String s = "" ;
-		for(int i=0; i<tabTraj.length; i++) {
-			s = s + tabTraj[i] + " | ";
-		}
-		return "Le tableau de la trajectoire est : " + s ;
-	}
+		try {
+			grenade=new SpriteSheet("src/main/ressources/Spritesheets/spritesheet_weapons.png",24,24).getSprite(2, 0);
+		} catch(Exception e) {
 			
-
-
-
+		}
+		xPosition=0; //valeur lambda
+		yPosition=0; //valeur lambda
+		isThere=false;
+	}
+	
+	public void paintComponent() {
+		if(isThere) {
+			//g.drawImage(grenade,xPosition,yPosition);
+			grenade.drawCentered(xPosition,yPosition);
+		}
+	}
+	
+	public void setIsThere(boolean b) {
+		isThere=b;
+	}
+	
+	public void setPosition(float x,float y) {
+		xPosition=x;
+		yPosition=y;
+	}
 }

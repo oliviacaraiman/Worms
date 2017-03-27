@@ -8,7 +8,6 @@ public class Map {
 	private int width;
 	private int heightTile;
 	private int widthTile;
-	private boolean[][] solThere;
 	private int tilesInWidth;
 	private int tilesInHeight;
 	private int r; //rayon d'explosion
@@ -25,12 +24,11 @@ public class Map {
 		width=map.getWidth()*widthTile;
 		tilesInWidth=map.getWidth();
 		tilesInHeight=map.getHeight();
-		solThere=new boolean[tilesInWidth][tilesInHeight];
-		setSolThere(solThere);
+		solThere();
 		r=4;
 	}
 	
-	public void render(int a, int b, int c) {
+	public void render(int a, int b) {
     	map.render(a,b);
 	}
 	
@@ -50,33 +48,21 @@ public class Map {
 		return widthTile;
 	}
 	
+	
 	//tableau où "true" signifie qu'il y a du sol
-	public void setSolThere(boolean[][] b) {
+	public boolean[][] solThere() {
+		boolean[][] b=new boolean[tilesInWidth][tilesInHeight];
 		for(int i=0;i<tilesInWidth;i++) {
 			for(int j=0;j<tilesInHeight;j++) {
-				Image tile=map.getTileImage(i, j, map.getLayerIndex("Sol"));
+				Image tile = map.getTileImage(i, j, map.getLayerIndex("Sol"));
 				b[i][j]=false;
 				if(tile!=null) {
+					//b[i][j]=(tile.getColor(i, j)).getAlpha()>0;
 					b[i][j]=true;
 				}
 			}
 		}
-	}
-	
-	public boolean[][] getSol() {
-		return solThere;
-	}
-	
-	//permet de calculer le ySol le plus bas pour un x donné
-	public float f(float x) {
-		int u=(int)x/widthTile;
-		int y=800;
-		for (int i=0;i<tilesInHeight;i++) {
-			if(!solThere[u][i]) {
-				y=(i+1)*heightTile;
-			}
-		}
-		return y;
+		return b;
 	}
 	
 	public boolean collision(float x,float y) {//méthode permettant de savoir si le joueur entre en collision avec le sol
@@ -84,7 +70,7 @@ public class Map {
 		int v=(int)(y/heightTile);
 		int u2=(int)(x%widthTile); //nombres de pixels dans le tile
 		int v2=(int)(y%heightTile);
-		boolean collide=getSol()[u][v];
+		boolean collide=solThere()[u][v];
 		Image tile = this.map.getTileImage(u,v,map.getLayerIndex("Sol"));
 		if(collide && tile!=null) { //contact au pixel près
 	        Color color = tile.getColor(u2,v2);
@@ -95,10 +81,29 @@ public class Map {
 		return collide;
 	}
 	
+	//permet de calculer le ySol le plus bas pour un x donné
+	public float f(float x) {
+		int u=(int)x/widthTile;
+		int v=tilesInWidth;
+		for (int i=0;i<tilesInHeight;i++) { //ce for donne une valeur approché à l'excès de y, on affine ensuite
+			if(!solThere()[u][i]) {
+				v=i+1;
+			}
+		}
+		float y=v*heightTile;
+		while (!collision(x,y+10)) { //approche grossière pour plus de rapidité
+			y=y+10;
+		}
+		while (!collision(x,y+1)) { //approche précise
+			y++;
+		}
+		return y;
+	}
+	
 	//détruit sur le rayon défini le sol, et fait des dégâts aux persos dans la zone
 	public void destroy(int x, int y, Joueur player) {
-		for (int i=x-r;i<x+r+1;i++) {
-			for (int j=y-r;j<y+r+1;j++) {
+		for (int i=Math.max(x-r,0);i<Math.min(x+r+1,tilesInWidth);i++) { //max et min pour les sorties d'écran
+			for (int j=Math.max(y-r,0);j<Math.min(y+r+1,tilesInHeight);j++) {
 				if(Math.pow(i-x,2)+Math.pow(j-y,2)<=Math.pow(r,2) && i>=0 && j>=0) {
 					map.setTileId(i, j, map.getLayerIndex("Sol"), 0);
 				}
