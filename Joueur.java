@@ -23,6 +23,14 @@ public class Joueur {
 	private final float LIFE_MAX;
 	private float life;
 	
+	private boolean jumping;
+	private int JUMP_HEIGHT;
+	private boolean goingUp;
+	private boolean goingDown;
+	private int highestPoint;
+	private float gravity;
+	private float base;
+	
 	private Grenade gr;
 
 	
@@ -36,6 +44,14 @@ public class Joueur {
 		dx=0;
 		dy=0;
 		
+		//différentes données à propos du saut
+		JUMP_HEIGHT = 150;
+		goingUp = false;
+		goingDown = false;
+		highestPoint = 10000;
+		gravity = -.05f;
+		jumping=false;
+		
 		//différence entre les deux personnages
 		direction=2*(num-1);
 		LARGEUR_PERSO=64;
@@ -44,6 +60,7 @@ public class Joueur {
 		Y_BEGIN=map.f(X_BEGIN+LARGEUR_PERSO/2);//hauteur du sol
 		xPerso=X_BEGIN;
 		yPerso=Y_BEGIN;
+		base=Y_BEGIN;
         
         //Création du HUD et de la grenade;
         hud=new Hud(num,this.map.getWidth(),nom);
@@ -91,7 +108,7 @@ public class Joueur {
 		g.setColor(new Color(0, 0, 0, .5f));
 		g.fillOval(xPerso + 10, yPerso - 4, 45, 8);
 		// dessin du personnage animé
-		g.drawAnimation(animations[(isMoving() ? 1+(int)direction/2: 0)/*+(isJumping() ? 2:0)*/], xPerso, yPerso-HAUTEUR_PERSO); //256 correspond à la hauteur du frame
+		g.drawAnimation(animations[(isMoving() ? 1+(int)direction/3: 0)+(isJumping() ? (toTheLeft() ? -1-(int)direction/3+3:0)+(toTheRight() ? -1-(int)direction/3+4:0):0)], xPerso, yPerso-HAUTEUR_PERSO);
 		//dessin de la barre de vie
 		hud.paintComponent(g,this.getPourcentVie());
 		gr.paintComponent();
@@ -101,8 +118,18 @@ public class Joueur {
 		// mouvement du personnage
 		if (this.isMoving()) {
 			updateDirection();
+			
 			float futurX=this.xPerso + .3f * delta * dx;
 			float futurY=this.yPerso + .3f * delta * dy;
+			
+			if(!jumping) {
+				base=yPerso;
+				if(!map.collision(futurX+LARGEUR_PERSO/2,futurY)) { //pas la même condition pour avoir une certaine "marge"
+					dy=-10*gravity;
+					futurY=this.yPerso + .3f * delta * dy;
+				}
+			}
+			
 			//conditions de sortie d'écran
 			if(futurX<0) {
 				futurX=0;
@@ -116,9 +143,32 @@ public class Joueur {
 			if(futurY>map.getHeight()) {
 				futurY=map.getHeight();
 			}
+			
+			if (jumping || goingUp || goingDown) {
+				if (futurY < highestPoint || goingUp) {
+					goingUp = true;
+					highestPoint = (int) futurY;
+					this.dy = gravity * delta;
+				}
+				if (highestPoint < base - JUMP_HEIGHT|| goingDown) {
+					goingUp = false;
+					goingDown = true;
+					this.dy = -gravity * delta;
+				}
+				if(map.collision(futurX+LARGEUR_PERSO/2,futurY-map.getHeightTile())) {
+					goingDown = false;
+					goingUp = false;
+					this.jumping = false;
+					highestPoint = 10000;
+					this.dy = 0;
+				}
+			}
+			
 			if(!map.collision(futurX+LARGEUR_PERSO/2,futurY-map.getHeightTile())) { //en cours d'écriture, on peut mettre contact pour l'instant
 				this.xPerso = futurX;
 				this.yPerso = futurY;
+			} else {
+				setDy(0); //cette partie permet de corriger des bugs causés par l'ajout de la gravité
 			}
 		}
 	}
@@ -138,10 +188,10 @@ public class Joueur {
 	public void setDirection(int direction) { 
 		this.direction = direction;
 		switch (direction) {
-			case 0: dx =  0; dy = -1; break;
-			case 1: dx = -1; dy =  0; break;
-			case 2: dx =  0; dy =  1; break;
-			case 3: dx =  1; dy =  0; break; 
+			case 0: dx =  0; dy = -0.5f; break;
+			case 1: dx = -0.5f; dy =  0; break;
+			case 2: dx =  0; dy =  0.5f; break;
+			case 3: dx =  0.5f; dy =  0; break; 
 			default: dx = 0; dy =  0; break;
 		} 
 	}
@@ -155,7 +205,23 @@ public class Joueur {
 	}
 	
 	public boolean isMoving() {
-		return dx != 0 || dy != 0;
+		return dx != 0 || dy != 0 || jumping==true;
+	}
+	
+	public void setJumping(boolean j) {
+		this.jumping = j;
+	}
+	
+	public boolean isJumping() {
+		return jumping;
+	}
+	
+	public boolean toTheLeft(){
+		return (dx<0);
+	}
+	
+	public boolean toTheRight(){
+		return (dx>0);
 	}
 	
 	public void stopMoving() {
@@ -217,10 +283,7 @@ public class Joueur {
 	
 	public float getHeight() {
 		return HAUTEUR_PERSO;
-		
 	}
-	
-	
 	
 	public float[] lancerGrenade(float a, float f) { //attention, diminution de y vers le haut, donc force<0 et g>0 et - devant la tangente
 		float angle = a ;
@@ -241,7 +304,6 @@ public class Joueur {
 			x=(float)(x+pas);
 			y =(float)(((10*Math.pow(x-x0,2))/(2*Math.pow(force,2)))*(1+Math.pow(Math.tan(angle),2)) - (x-x0)*Math.tan(angle)+y0);
 			gr.setPosition(x,y);
-			gr.paintComponent();
 		}
 		
 		float[] tabTraj=new float[traj.size()]; //tableau provisoire, ensuite on affichera les grenades
