@@ -217,7 +217,10 @@ public class Joueur {
 	
 	public float getHeight() {
 		return HAUTEUR_PERSO;
+		
 	}
+	
+	
 	
 	public float[] lancerGrenade(float a, float f) { //attention, diminution de y vers le haut, donc force<0 et g>0 et - devant la tangente
 		float angle = a ;
@@ -238,6 +241,7 @@ public class Joueur {
 			x=(float)(x+pas);
 			y =(float)(((10*Math.pow(x-x0,2))/(2*Math.pow(force,2)))*(1+Math.pow(Math.tan(angle),2)) - (x-x0)*Math.tan(angle)+y0);
 			gr.setPosition(x,y);
+			gr.paintComponent();
 		}
 		
 		float[] tabTraj=new float[traj.size()]; //tableau provisoire, ensuite on affichera les grenades
