@@ -1,4 +1,5 @@
 import org.newdawn.slick.*;
+import org.newdawn.slick.gui.*;
 
 public class Worms extends BasicGame {
 
@@ -13,6 +14,8 @@ public class Worms extends BasicGame {
 	private ControlPlayer controller;
 	private TextNextTurn tnt;
 	
+	private TextField puissanceJet;
+	
 	public Worms() {
         super("Worms");
     }
@@ -26,9 +29,11 @@ public class Worms extends BasicGame {
     	jCourant=j1;
     	j1.init();
     	j2.init();
-    	controller = new ControlPlayer(jCourant);
+    	controller = new ControlPlayer(j1,j2);
     	container.getInput().addKeyListener(controller);
     	tnt=new TextNextTurn(dimX/2,dimY/4,j1);
+    	/*puissanceJet=new TextField(container,container.getDefaultFont(),600,40,100,30);
+    	System.out.println("Puissance Jet here");*/
     }
     
 
@@ -37,6 +42,7 @@ public class Worms extends BasicGame {
     	j1.render(g);
     	j2.render(g);
     	tnt.paintComponent(g);
+    	puissanceJet.render(container, g);
     }
 
     public void update(GameContainer container, int delta) throws SlickException {
@@ -44,12 +50,7 @@ public class Worms extends BasicGame {
     }
     
     public void changeJoueurCourant() {
-    	if(jCourant.equals(j1)) {
-    		jCourant=j2;
-    	} else {
-    		jCourant=j1;
-    	}
-    	controller.setJoueurCourant(jCourant);
+    	controller.setJoueurCourant();
     }
     
     public void keyReleased(int key, char c) {

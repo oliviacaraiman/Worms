@@ -44,7 +44,7 @@ public class Joueur {
 		dx=0;
 		dy=0;
 		
-		//diffÃ©rentes donnÃ©es Ã  propos du saut
+		//différentes données à propos du saut
 		JUMP_HEIGHT = 150;
 		goingUp = false;
 		goingDown = false;
@@ -52,21 +52,21 @@ public class Joueur {
 		gravity = -.05f;
 		jumping=false;
 		
-		//diffÃ©rence entre les deux personnages
+		//différence entre les deux personnages
 		direction=2*(num-1);
 		LARGEUR_PERSO=64;
 		HAUTEUR_PERSO=128;
-		X_BEGIN=200+(num-1)*(this.map.getWidth()-400-LARGEUR_PERSO); //200 pour l'Ã©cart au bord
+		X_BEGIN=200+(num-1)*(this.map.getWidth()-400-LARGEUR_PERSO); //200 pour l'écart au bord
 		Y_BEGIN=map.f(X_BEGIN+LARGEUR_PERSO/2);//hauteur du sol
 		xPerso=X_BEGIN;
 		yPerso=Y_BEGIN;
 		base=Y_BEGIN;
         
-        //CrÃ©ation du HUD et de la grenade;
+        //Création du HUD et de la grenade;
         hud=new Hud(num,this.map.getWidth(),nom);
         gr=new Grenade();
         
-        //Augmentation du numÃ©ro du joueur
+        //Augmentation du numéro du joueur
         numeroJoueur=num;
 		num++;
 	}
@@ -107,7 +107,7 @@ public class Joueur {
 		// ombre personnage
 		g.setColor(new Color(0, 0, 0, .5f));
 		g.fillOval(xPerso + 10, yPerso - 4, 45, 8);
-		// dessin du personnage animÃ©
+		// dessin du personnage animé
 		g.drawAnimation(animations[(isMoving() ? 1+(int)direction/3: 0)+(isJumping() ? (toTheLeft() ? -1-(int)direction/3+3:0)+(toTheRight() ? -1-(int)direction/3+4:0):0)], xPerso, yPerso-HAUTEUR_PERSO);
 		//dessin de la barre de vie
 		hud.paintComponent(g,this.getPourcentVie());
@@ -124,13 +124,13 @@ public class Joueur {
 			
 			if(!jumping) {
 				base=yPerso;
-				if(!map.collision(futurX+LARGEUR_PERSO/2,futurY)) { //pas la mÃªme condition pour avoir une certaine "marge"
+				if(!map.collision(futurX+LARGEUR_PERSO/2,futurY)) { //pas la même condition pour avoir une certaine "marge"
 					dy=-10*gravity;
 					futurY=this.yPerso + .3f * delta * dy;
 				}
 			}
 			
-			//conditions de sortie d'Ã©cran
+			//conditions de sortie d'écran
 			if(futurX<0) {
 				futurX=0;
 			}
@@ -140,8 +140,8 @@ public class Joueur {
 			if(futurX>map.getWidth()-LARGEUR_PERSO) {
 				futurX=map.getWidth()-LARGEUR_PERSO;
 			}
-			if(futurY>map.getHeight()) {
-				futurY=map.getHeight();
+			if(futurY>map.getHeight()-map.getHeightTile()) {
+				futurY=map.getHeight()+1-map.getHeightTile(); //pour éviter les problèmes OutOfBounds
 			}
 			
 			if (jumping || goingUp || goingDown) {
@@ -164,11 +164,11 @@ public class Joueur {
 				}
 			}
 			
-			if(!map.collision(futurX+LARGEUR_PERSO/2,futurY-map.getHeightTile())) { //en cours d'Ã©criture, on peut mettre contact pour l'instant
+			if(!map.collision(futurX+LARGEUR_PERSO/2,futurY-map.getHeightTile())) { //en cours d'écriture, on peut mettre contact pour l'instant
 				this.xPerso = futurX;
 				this.yPerso = futurY;
 			} else {
-				setDy(0); //cette partie permet de corriger des bugs causÃ©s par l'ajout de la gravitÃ©
+				setDy(0); //cette partie permet de corriger des bugs causés par l'ajout de la gravité
 			}
 		}
 	}
@@ -291,20 +291,19 @@ public class Joueur {
 		float pas=8f;
 		ArrayList<Float> traj=new ArrayList<Float>();
 		
-		float x0=(float)(xPerso+LARGEUR_PERSO/2);//valeur de dÃ©part de x
-		float y0=(float)(yPerso-LARGEUR_PERSO/4);//valeur de dÃ©part de y, au milieu du corps du perso
+		float x0=(float)(xPerso+LARGEUR_PERSO/2);//valeur de départ de x
+		float y0=(float)(yPerso-LARGEUR_PERSO/4);//valeur de départ de y, au milieu du corps du perso
 		gr.setPosition(x0,y0);
 		gr.setIsThere(true);
 		
-		traj.add(yPerso); //premiÃ¨re valeur de y
+		traj.add(yPerso); //première valeur de y
 		float x=(float)(x0+pas);
-		float y =(float)(((10*Math.pow(x-x0,2))/(2*Math.pow(force,2)))*(1+Math.pow(Math.tan(angle),2)) - (x-x0)*Math.tan(angle)+y0); //1ere itÃ©ration
-		while(x>pas && x<map.getWidth()-pas && y>pas && y<map.getHeight()-pas && !map.collision(x, y)) { //ne pas faire les tests si sortie d'Ã©cran
-			traj.add(y);//ajout du prÃ©cÃ©dent
+		float y =(float)(((10*Math.pow(x-x0,2))/(2*Math.pow(force,2)))*(1+Math.pow(Math.tan(angle),2)) - (x-x0)*Math.tan(angle)+y0); //1ere itération
+		while(x>pas && x<map.getWidth()-pas && y>pas && y<map.getHeight()-pas && !map.collision(x, y)) { //ne pas faire les tests si sortie d'écran
+			traj.add(y);//ajout du précédent
 			x=(float)(x+pas);
 			y =(float)(((10*Math.pow(x-x0,2))/(2*Math.pow(force,2)))*(1+Math.pow(Math.tan(angle),2)) - (x-x0)*Math.tan(angle)+y0);
 			gr.setPosition(x,y);
-			gr.paintComponent();
 		}
 		
 		float[] tabTraj=new float[traj.size()]; //tableau provisoire, ensuite on affichera les grenades
@@ -312,7 +311,7 @@ public class Joueur {
 			tabTraj[j]=(float)(traj.get(j));
 		}
 		
-		float[] finale={(int)x/map.getWidthTile(),(int)(y+1)/map.getWidthTile()}; //+1 car on s'arrÃªte juste avant l'entier
+		float[] finale={(int)x/map.getWidthTile(),(int)(y+1)/map.getWidthTile()}; //+1 car on s'arrête juste avant l'entier
 		return finale;	
 	}
 }

@@ -10,12 +10,10 @@ public class Grenade {
 	private float xPosition;
 	private float yPosition;
 	private boolean isThere;
-	private Timer timer;
 
 	public Grenade() {
 		try {
-			grenade = new SpriteSheet("src/main/ressources/Spritesheets/spritesheet_ground.png", 24, 24).getSprite(2,
-					0);
+			grenade=new SpriteSheet("src/main/ressources/Spritesheets/spritesheet_weapons.png",24,24).getSprite(2, 0);
 		} catch (Exception e) {
 
 		}
@@ -48,7 +46,7 @@ public class Grenade {
 				xPosition = x;
 				yPosition = y;
 				try {
-					Thread.sleep(10);
+					Thread.sleep(15);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
@@ -60,3 +58,5 @@ public class Grenade {
 		myTimer.start();
 	}
 }
+			
+

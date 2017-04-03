@@ -109,7 +109,7 @@ public class Map {
 				}
 			}
 		}
-		if(Math.pow((player.getX()+player.getWidth()/2)/widthTile-x,2)+Math.pow(player.getY()/heightTile-y,2)<=Math.pow(r,2)) {
+		if(Math.min(Math.pow((player.getX()+player.getWidth())/widthTile-x,2),Math.pow(player.getX()/widthTile-x,2))+Math.min(Math.pow((player.getY()-player.getHeight()/2)/heightTile-y,2),Math.pow(player.getY()/heightTile-y,2))<=Math.pow(r,2)) {
 			player.setVie(player.getVie()-10);
 		}
 	}
