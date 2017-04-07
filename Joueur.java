@@ -1,5 +1,10 @@
 import org.newdawn.slick.*;
-import java.util.*;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+import javax.swing.*;
 
 public class Joueur {
 
@@ -15,11 +20,15 @@ public class Joueur {
 	private float dx,dy;
 	private int direction;
 	private boolean moving;
+	public final int DISTANCE_MAX = 350;
+	private int distanceParcourue;
+	public boolean grenadeLancee;
 	
 	private final float LARGEUR_PERSO;
 	private final float HAUTEUR_PERSO;
 	//concerne l'affichage de la vie sur la carte
 	private Hud hud;
+	private Hud_Distance hud_distance;
 	private final float LIFE_MAX;
 	private float life;
 	
@@ -61,9 +70,11 @@ public class Joueur {
 		xPerso=X_BEGIN;
 		yPerso=Y_BEGIN;
 		base=Y_BEGIN;
+		grenadeLancee = false;
         
         //Création du HUD et de la grenade;
         hud=new Hud(num,this.map.getWidth(),nom);
+        hud_distance=new Hud_Distance(num,this.map.getWidth(),nom);
         gr=new Grenade();
         
         //Augmentation du numéro du joueur
@@ -111,12 +122,14 @@ public class Joueur {
 		g.drawAnimation(animations[(isMoving() ? 1+(int)direction/3: 0)+(isJumping() ? (toTheLeft() ? -1-(int)direction/3+3:0)+(toTheRight() ? -1-(int)direction/3+4:0):0)], xPerso, yPerso-HAUTEUR_PERSO);
 		//dessin de la barre de vie
 		hud.paintComponent(g,this.getPourcentVie());
+		hud_distance.paintComponent(g,1 - (float)distanceParcourue/DISTANCE_MAX);
 		gr.paintComponent();
 	}
 	
 	public void update(int delta) {
 		// mouvement du personnage
-		if (this.isMoving()) {
+		checkDistance();
+		if (this.isMoving() || this.isJumping() == true) {
 			updateDirection();
 			
 			float futurX=this.xPerso + .3f * delta * dx;
@@ -173,6 +186,29 @@ public class Joueur {
 		}
 	}
 	
+	public float getPourcentDistance(){
+		System.out.println("raport" + (float)distanceParcourue/DISTANCE_MAX);
+		return 1-(float)(distanceParcourue/DISTANCE_MAX);
+	}
+	
+	//methode qui calcule la dist parcourue
+	public void checkDistance(){
+		if (this.isMoving()&& distanceParcourue<= DISTANCE_MAX && this.isJumping() ){
+			this.distanceParcourue += 1;
+		}
+			
+		if (this.isJumping() && distanceParcourue>DISTANCE_MAX){
+			this.distanceParcourue += 1;
+			setDx(0);
+	//		System.out.println("dist:" + distanceParcourue);
+		}
+		
+		if (!this.isJumping() && distanceParcourue > DISTANCE_MAX) {
+				this.stopMoving();
+		}
+		
+	}
+	
 	private void updateDirection() {
 		if (dx > 0 && dx >= Math.abs(dy)) {
 			direction = 3;
@@ -205,7 +241,7 @@ public class Joueur {
 	}
 	
 	public boolean isMoving() {
-		return dx != 0 || dy != 0 || jumping==true;
+		return dx != 0 || dy != 0 /*|| jumping==true */;
 	}
 	
 	public void setJumping(boolean j) {
@@ -252,6 +288,14 @@ public class Joueur {
 	public void setDy(float dy) {
 		this.dy = dy;
 	}
+	
+	public int getDistanceParcourue(){
+		return distanceParcourue;
+	}
+	
+	public void setDistanceParcourue(int dist){
+		distanceParcourue = dist;
+	}
 
 	public Animation[] getAnimations() {
 		return animations;
@@ -275,6 +319,10 @@ public class Joueur {
 	
 	public void destroy(int x, int y) {
 		map.destroy(x,y,this);
+	}
+	
+	public void changeLife(int x, int y){
+		map.changeLife(x, y, this);
 	}
 	
 	public float getWidth() {
@@ -312,6 +360,19 @@ public class Joueur {
 		}
 		
 		float[] finale={(int)x/map.getWidthTile(),(int)(y+1)/map.getWidthTile()}; //+1 car on s'arrête juste avant l'entier
+		final int xLand = (int)x/map.getWidthTile();
+		final int yLand = (int)(y+1)/map.getWidthTile();
+		//timer pour dessiner le trou au bon moment
+		ActionListener listener = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				destroy(xLand, yLand);
+			}
+		};
+		Timer myTimer = new Timer(1000, listener);
+		myTimer.setInitialDelay(0);
+		myTimer.setRepeats(false);
+		myTimer.start();
+		grenadeLancee = true;
 		return finale;	
 	}
 }

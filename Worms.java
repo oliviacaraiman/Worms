@@ -1,3 +1,6 @@
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.newdawn.slick.*;
 import org.newdawn.slick.gui.*;
 
@@ -42,19 +45,33 @@ public class Worms extends BasicGame {
     	j1.render(g);
     	j2.render(g);
     	tnt.paintComponent(g);
-    	puissanceJet.render(container, g);
+    //	puissanceJet.render(container, g);
     }
-
+    
     public void update(GameContainer container, int delta) throws SlickException {
     	jCourant.update(delta);
+    	if (jCourant.getDistanceParcourue() >= jCourant.DISTANCE_MAX && jCourant.grenadeLancee && !jCourant.isJumping()
+    			&& !jCourant.isMoving()){
+    		changeJoueurCourant();
+    		tnt.setIsThere(true, jCourant);
+    		
+    	}
     }
     
     public void changeJoueurCourant() {
     	controller.setJoueurCourant();
+    	jCourant = controller.getJoueurCourant();
+    	jCourant.setDistanceParcourue(0);
+    	jCourant.grenadeLancee = false;
+    	//tnt.setIsThere(true,jCourant);
     }
     
     public void keyReleased(int key, char c) {
     	controller.keyReleased(key, c);
+    }
+    
+    public void keyPressed(int key, char c) {
+    	controller.keyPressed(key, c);
     	if (Input.KEY_ENTER==key) {
     		jCourant.stopMoving();
     		this.changeJoueurCourant();
@@ -62,10 +79,6 @@ public class Worms extends BasicGame {
     	} else if (Input.KEY_ESCAPE==key) {
             container.exit();
         }
-    }
-    
-    public void keyPressed(int key, char c) {
-    	controller.keyPressed(key, c);
     }
 
     public static void main(String[] args) throws SlickException {

@@ -1,13 +1,20 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.annotation.Generated;
+
 import org.newdawn.slick.Input;
 import org.newdawn.slick.KeyListener;
+import javax.swing.*;
 
 public class ControlPlayer implements KeyListener {
 	private Joueur playerCourant;
 	private Joueur playerSuivant;
-	
+
 	public ControlPlayer(Joueur playerC,Joueur playerS){
 		this.playerCourant = playerC;
 		this.playerSuivant = playerS;
+
 	}
 	
 	public void setJoueurCourant() {
@@ -28,6 +35,10 @@ public class ControlPlayer implements KeyListener {
 
 	public void setInput(Input arg0) {
 	}
+	
+	public Joueur getJoueurCourant(){
+		return playerCourant;
+	}
 
 	public void keyPressed(int key, char c) {
 		switch (key) {
@@ -46,9 +57,12 @@ public class ControlPlayer implements KeyListener {
 			break;
 		case Input.KEY_D: //pour tester la destruction du décor
 			float[] dest={0,0};
+			if (!playerCourant.grenadeLancee){
 			dest=playerCourant.lancerGrenade(0.5f, 75f);
-			playerCourant.destroy((int)dest[0],(int)dest[1]);
-			playerSuivant.destroy((int)dest[0],(int)dest[1]);
+//			playerCourant.destroy((int)dest[0],(int)dest[1]);
+			playerSuivant.changeLife((int)dest[0],(int)dest[1]);
+			playerCourant.changeLife((int)dest[0],(int)dest[1]);
+			}
 			break;
 		}
 	}

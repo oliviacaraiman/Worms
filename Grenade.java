@@ -23,8 +23,16 @@ public class Grenade {
 	}
 
 	public void paintComponent() {
+		ActionListener disparitionGrenade = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setIsThere(false);
+			}
+		};
 		if (isThere) {
 			grenade.drawCentered(xPosition, yPosition);
+			Timer grenadeTimer = new Timer(1500,disparitionGrenade);
+			grenadeTimer.setRepeats(false);
+			grenadeTimer.start();
 		}
 	}
 
@@ -40,7 +48,6 @@ public class Grenade {
 
 	public void setPosition(float x, float y) {
 		//timer pour lancer la grenade
-		//y a un probleme avec le trou qui est dessiner plus tot, mais je vais le resoudre apres
 		ActionListener listener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				xPosition = x;

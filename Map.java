@@ -100,6 +100,12 @@ public class Map {
 		return y;
 	}
 	
+	public void changeLife(int x, int y, Joueur player){
+		if(Math.min(Math.pow((player.getX()+player.getWidth())/widthTile-x,2),Math.pow(player.getX()/widthTile-x,2))+Math.min(Math.pow((player.getY()-player.getHeight()/2)/heightTile-y,2),Math.pow(player.getY()/heightTile-y,2))<=Math.pow(r,2)) {
+			player.setVie(player.getVie()-10);
+		}
+	}
+	
 	//détruit sur le rayon défini le sol, et fait des dégâts aux persos dans la zone
 	public void destroy(int x, int y, Joueur player) {
 		for (int i=Math.max(x-r,0);i<Math.min(x+r+1,tilesInWidth);i++) { //max et min pour les sorties d'écran
@@ -109,8 +115,8 @@ public class Map {
 				}
 			}
 		}
-		if(Math.min(Math.pow((player.getX()+player.getWidth())/widthTile-x,2),Math.pow(player.getX()/widthTile-x,2))+Math.min(Math.pow((player.getY()-player.getHeight()/2)/heightTile-y,2),Math.pow(player.getY()/heightTile-y,2))<=Math.pow(r,2)) {
-			player.setVie(player.getVie()-10);
-		}
+//		if(Math.min(Math.pow((player.getX()+player.getWidth())/widthTile-x,2),Math.pow(player.getX()/widthTile-x,2))+Math.min(Math.pow((player.getY()-player.getHeight()/2)/heightTile-y,2),Math.pow(player.getY()/heightTile-y,2))<=Math.pow(r,2)) {
+//			player.setVie(player.getVie()-10);
+//		}
 	}
 }
