@@ -23,14 +23,14 @@ public class Grenade {
 	}
 
 	public void paintComponent() {
-		ActionListener disparitionGrenade = new ActionListener() {
+		ActionListener disparitionGrenade=new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setIsThere(false);
 			}
 		};
 		if (isThere) {
 			grenade.drawCentered(xPosition, yPosition);
-			Timer grenadeTimer = new Timer(1500,disparitionGrenade);
+			Timer grenadeTimer=new Timer(1500,disparitionGrenade);
 			grenadeTimer.setRepeats(false);
 			grenadeTimer.start();
 		}

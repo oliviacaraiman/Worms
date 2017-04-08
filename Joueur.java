@@ -1,9 +1,6 @@
 import org.newdawn.slick.*;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.util.ArrayList;
-
 import javax.swing.*;
 
 public class Joueur {
@@ -20,7 +17,7 @@ public class Joueur {
 	private float dx,dy;
 	private int direction;
 	private boolean moving;
-	public final int DISTANCE_MAX = 350;
+	public final int DISTANCE_MAX=200;
 	private int distanceParcourue;
 	public boolean grenadeLancee;
 	
@@ -43,7 +40,7 @@ public class Joueur {
 	private Grenade gr;
 
 	
-	public Joueur(String nom,Map map) throws SlickException {
+	public Joueur(String nom,Map map,int dimX) throws SlickException {
 		//initialisation des variables simples
 		this.nom=nom;
 		this.map=map;
@@ -54,27 +51,27 @@ public class Joueur {
 		dy=0;
 		
 		//différentes données à propos du saut
-		JUMP_HEIGHT = 150;
+		JUMP_HEIGHT = 160;
 		goingUp = false;
 		goingDown = false;
 		highestPoint = 10000;
-		gravity = -.05f;
+		gravity = -.03f;
 		jumping=false;
 		
 		//différence entre les deux personnages
 		direction=2*(num-1);
 		LARGEUR_PERSO=64;
 		HAUTEUR_PERSO=128;
-		X_BEGIN=200+(num-1)*(this.map.getWidth()-400-LARGEUR_PERSO); //200 pour l'écart au bord
+		X_BEGIN=100+(num-1)*(this.map.getWidth()-200-LARGEUR_PERSO); //200 pour l'écart au bord
 		Y_BEGIN=map.f(X_BEGIN+LARGEUR_PERSO/2);//hauteur du sol
 		xPerso=X_BEGIN;
 		yPerso=Y_BEGIN;
 		base=Y_BEGIN;
-		grenadeLancee = false;
+		grenadeLancee=false;
         
         //Création du HUD et de la grenade;
-        hud=new Hud(num,this.map.getWidth(),nom);
-        hud_distance=new Hud_Distance(num,this.map.getWidth(),nom);
+        hud=new Hud(num,dimX,nom);
+        hud_distance=new Hud_Distance(num,dimX);
         gr=new Grenade();
         
         //Augmentation du numéro du joueur
@@ -129,7 +126,7 @@ public class Joueur {
 	public void update(int delta) {
 		// mouvement du personnage
 		checkDistance();
-		if (this.isMoving() || this.isJumping() == true) {
+		if (this.isMoving() || this.isJumping()) {
 			updateDirection();
 			
 			float futurX=this.xPerso + .3f * delta * dx;
@@ -138,7 +135,7 @@ public class Joueur {
 			if(!jumping) {
 				base=yPerso;
 				if(!map.collision(futurX+LARGEUR_PERSO/2,futurY)) { //pas la même condition pour avoir une certaine "marge"
-					dy=-10*gravity;
+					dy=-16*gravity;
 					futurY=this.yPerso + .3f * delta * dy;
 				}
 			}
@@ -193,7 +190,7 @@ public class Joueur {
 	
 	//methode qui calcule la dist parcourue
 	public void checkDistance(){
-		if (this.isMoving()&& distanceParcourue<= DISTANCE_MAX && this.isJumping() ){
+		if ((this.isMoving() || this.isJumping() )&& distanceParcourue<= DISTANCE_MAX){
 			this.distanceParcourue += 1;
 		}
 			
@@ -207,7 +204,7 @@ public class Joueur {
 				this.stopMoving();
 		}
 		
-	}
+}
 	
 	private void updateDirection() {
 		if (dx > 0 && dx >= Math.abs(dy)) {
@@ -241,7 +238,7 @@ public class Joueur {
 	}
 	
 	public boolean isMoving() {
-		return dx != 0 || dy != 0 /*|| jumping==true */;
+		return dx != 0 || dy != 0;
 	}
 	
 	public void setJumping(boolean j) {
@@ -289,12 +286,12 @@ public class Joueur {
 		this.dy = dy;
 	}
 	
-	public int getDistanceParcourue(){
+	public int getDistanceParcourue() {
 		return distanceParcourue;
 	}
 	
-	public void setDistanceParcourue(int dist){
-		distanceParcourue = dist;
+	public void setDistanceParcourue(int dist) {
+		distanceParcourue=dist;
 	}
 
 	public Animation[] getAnimations() {
@@ -321,8 +318,8 @@ public class Joueur {
 		map.destroy(x,y,this);
 	}
 	
-	public void changeLife(int x, int y){
-		map.changeLife(x, y, this);
+	public void changeLife(int x, int y) {
+		map.changeLife(x,y,this);
 	}
 	
 	public float getWidth() {
@@ -333,10 +330,11 @@ public class Joueur {
 		return HAUTEUR_PERSO;
 	}
 	
-	public float[] lancerGrenade(float a, float f) { //attention, diminution de y vers le haut, donc force<0 et g>0 et - devant la tangente
-		float angle = a ;
+	public float[] lancerGrenade(float a, float f,int direct) { //attention, diminution de y vers le haut, donc force<0 et g>0 et - devant la tangente
+		float pas=(float)(-a/10+11); //dépend de l'angle
+		float angle =(float)(a*2*Math.PI/360) ; //a en degré, angle en radians
 		float force = -f ;
-		float pas=8f;
+		int dir=direct;
 		ArrayList<Float> traj=new ArrayList<Float>();
 		
 		float x0=(float)(xPerso+LARGEUR_PERSO/2);//valeur de départ de x
@@ -345,18 +343,23 @@ public class Joueur {
 		gr.setIsThere(true);
 		
 		traj.add(yPerso); //première valeur de y
-		float x=(float)(x0+pas);
+		float x;
+		if(dir==1) {
+			x=(float)(x0+pas);
+		} else { //tir à gauche
+			x=(float)(x0-pas);
+			angle=-angle+(float)Math.PI;
+		}
 		float y =(float)(((10*Math.pow(x-x0,2))/(2*Math.pow(force,2)))*(1+Math.pow(Math.tan(angle),2)) - (x-x0)*Math.tan(angle)+y0); //1ere itération
 		while(x>pas && x<map.getWidth()-pas && y>pas && y<map.getHeight()-pas && !map.collision(x, y)) { //ne pas faire les tests si sortie d'écran
 			traj.add(y);//ajout du précédent
-			x=(float)(x+pas);
+			if(dir==1) {
+				x=(float)(x+pas);
+			} else { //tir à gauche
+				x=(float)(x-pas);
+			}
 			y =(float)(((10*Math.pow(x-x0,2))/(2*Math.pow(force,2)))*(1+Math.pow(Math.tan(angle),2)) - (x-x0)*Math.tan(angle)+y0);
 			gr.setPosition(x,y);
-		}
-		
-		float[] tabTraj=new float[traj.size()]; //tableau provisoire, ensuite on affichera les grenades
-		for (int j=0;j<tabTraj.length;j++) {
-			tabTraj[j]=(float)(traj.get(j));
 		}
 		
 		float[] finale={(int)x/map.getWidthTile(),(int)(y+1)/map.getWidthTile()}; //+1 car on s'arrête juste avant l'entier
@@ -374,5 +377,14 @@ public class Joueur {
 		myTimer.start();
 		grenadeLancee = true;
 		return finale;	
+	}
+	
+	public void translateHud(int x) {
+		hud.translate(x);
+		hud_distance.translate(x);
+	}
+	
+	public void setGrenade(boolean b) {
+		grenadeLancee=false;
 	}
 }

@@ -14,7 +14,7 @@ public class Map {
 	
 	public Map() throws SlickException {
 		try {
-		map=new TiledMap("src/main/ressources/map/map2.tmx");
+			map=new TiledMap("src/main/ressources/map/map3.tmx");
 		} catch (Exception e) {
 			
 		}
@@ -102,7 +102,7 @@ public class Map {
 	
 	public void changeLife(int x, int y, Joueur player){
 		if(Math.min(Math.pow((player.getX()+player.getWidth())/widthTile-x,2),Math.pow(player.getX()/widthTile-x,2))+Math.min(Math.pow((player.getY()-player.getHeight()/2)/heightTile-y,2),Math.pow(player.getY()/heightTile-y,2))<=Math.pow(r,2)) {
-			player.setVie(player.getVie()-10);
+			player.setVie(player.getVie()-20);
 		}
 	}
 	
@@ -115,8 +115,5 @@ public class Map {
 				}
 			}
 		}
-//		if(Math.min(Math.pow((player.getX()+player.getWidth())/widthTile-x,2),Math.pow(player.getX()/widthTile-x,2))+Math.min(Math.pow((player.getY()-player.getHeight()/2)/heightTile-y,2),Math.pow(player.getY()/heightTile-y,2))<=Math.pow(r,2)) {
-//			player.setVie(player.getVie()-10);
-//		}
 	}
 }

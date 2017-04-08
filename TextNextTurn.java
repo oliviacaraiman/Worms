@@ -7,8 +7,9 @@ import org.newdawn.slick.Graphics;
 
 public class TextNextTurn {
 
-	private final float X_POSITION;
-	private final float Y_POSITION;
+	private float X_POSITION;
+	private float Y_POSITION;
+	private int xTranslate;
 	private boolean isThere;
 	private Joueur jCourant;
 	private Timer timer;
@@ -17,6 +18,7 @@ public class TextNextTurn {
 	public TextNextTurn(float x, float y, Joueur jc) {
 		X_POSITION=x; //valeur au centre
 		Y_POSITION=y; //valeur au centre
+		xTranslate=0;
 		jCourant=jc;
 		isThere=false;
 		java.awt.Font font = new java.awt.Font("Distant Galaxy", java.awt.Font.PLAIN, 32);
@@ -27,17 +29,17 @@ public class TextNextTurn {
 	
 	class RemindTask extends TimerTask{
 		public void run() {
-			setIsThere(false, jCourant);	
+			setIsThere(false, jCourant);
 		}
 	}
 	
 	public void paintComponent(Graphics g) {
-		
 		if(isThere) {
+			g.setColor(Color.black);
 			g.setFont(ttf);
 			String s="Au tour de "+jCourant.getNom();
-			g.drawString(s,X_POSITION-g.getFont().getWidth(s)/2,Y_POSITION);
-			timer.schedule( new RemindTask(), 1000); //timer:fait disparaitre le text apres 1 sec
+			g.drawString(s,X_POSITION-xTranslate-g.getFont().getWidth(s)/2,Y_POSITION);
+			timer.schedule(new RemindTask(), 1000); //timer:fait disparaitre le text apres 1 sec
 		}
 	}
 	
@@ -47,4 +49,7 @@ public class TextNextTurn {
 		isThere=b;
 	}
 	
+	public void translate(int x) {
+		xTranslate=x;
+	}
 }

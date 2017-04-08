@@ -1,8 +1,4 @@
-import java.util.Timer;
-import java.util.TimerTask;
-
 import org.newdawn.slick.*;
-import org.newdawn.slick.gui.*;
 
 public class Worms extends BasicGame {
 
@@ -16,8 +12,8 @@ public class Worms extends BasicGame {
 	private Joueur jCourant;
 	private ControlPlayer controller;
 	private TextNextTurn tnt;
-	
-	private TextField puissanceJet;
+	private ControlHud control;
+	private Camera cam;
 	
 	public Worms() {
         super("Worms");
@@ -27,58 +23,60 @@ public class Worms extends BasicGame {
     public void init(GameContainer container) throws SlickException {
     	this.container=container;
     	map=new Map();
-    	j1=new Joueur("Albert",map);
-    	j2=new Joueur("Anna",map);
+    	j1=new Joueur("Albert",map,dimX);
+    	j2=new Joueur("Anna",map,dimX);
     	jCourant=j1;
     	j1.init();
     	j2.init();
-    	controller = new ControlPlayer(j1,j2);
+    	control=new ControlHud(container,dimX);
+    	controller = new ControlPlayer(j1,j2,control);
     	container.getInput().addKeyListener(controller);
     	tnt=new TextNextTurn(dimX/2,dimY/4,j1);
-    	/*puissanceJet=new TextField(container,container.getDefaultFont(),600,40,100,30);
-    	System.out.println("Puissance Jet here");*/
+    	cam=new Camera(jCourant,this);
     }
     
 
     public void render(GameContainer container, Graphics g) throws SlickException {
+    	cam.render(dimX,map.getWidth(), g);
     	map.render(0, 0);
     	j1.render(g);
     	j2.render(g);
     	tnt.paintComponent(g);
-    //	puissanceJet.render(container, g);
+    	control.paintComponent(container, g);
     }
-    
+
     public void update(GameContainer container, int delta) throws SlickException {
     	jCourant.update(delta);
-    	if (jCourant.getDistanceParcourue() >= jCourant.DISTANCE_MAX && jCourant.grenadeLancee && !jCourant.isJumping()
-    			&& !jCourant.isMoving()){
-    		changeJoueurCourant();
-    		tnt.setIsThere(true, jCourant);
-    		
-    	}
     }
     
     public void changeJoueurCourant() {
     	controller.setJoueurCourant();
-    	jCourant = controller.getJoueurCourant();
-    	jCourant.setDistanceParcourue(0);
-    	jCourant.grenadeLancee = false;
-    	//tnt.setIsThere(true,jCourant);
+    	jCourant=controller.getJoueurCourant();
+    	cam.setJoueur(jCourant);
     }
     
     public void keyReleased(int key, char c) {
     	controller.keyReleased(key, c);
-    }
-    
-    public void keyPressed(int key, char c) {
-    	controller.keyPressed(key, c);
     	if (Input.KEY_ENTER==key) {
     		jCourant.stopMoving();
+    		jCourant.setDistanceParcourue(0);
+    		jCourant.setGrenade(false);
     		this.changeJoueurCourant();
     		tnt.setIsThere(true,jCourant);
     	} else if (Input.KEY_ESCAPE==key) {
             container.exit();
         }
+    }
+    
+    public void keyPressed(int key, char c) {
+    	controller.keyPressed(key, c);
+    }
+    
+    public void translate(int x) {
+    	j1.translateHud(x);
+    	j2.translateHud(x);
+    	tnt.translate(x);
+    	control.translate(x);
     }
 
     public static void main(String[] args) throws SlickException {
