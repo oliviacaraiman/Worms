@@ -1,11 +1,15 @@
 import org.newdawn.slick.*;
+import org.newdawn.slick.state.BasicGameState;
+import org.newdawn.slick.state.GameState;
+import org.newdawn.slick.state.StateBasedGame;
 
-public class Worms extends BasicGame {
-
+public class Worms extends BasicGameState /*implements GameState, Game*/{
+	private StateBasedGame game;
 	private GameContainer container;
 	private Map map;
 	private static int dimX=1440;
 	private static int dimY=800;
+	public static final int ID =2;
 
 	private Joueur j1;
 	private Joueur j2;
@@ -14,17 +18,18 @@ public class Worms extends BasicGame {
 	private TextNextTurn tnt;
 	private ControlHud control;
 	private Camera cam;
+	private HudPlayController hudPlay;
 	
-	public Worms() {
-        super("Worms");
-    }
+	
 
 
-    public void init(GameContainer container) throws SlickException {
+    public void init(GameContainer container, StateBasedGame game) throws SlickException {
     	this.container=container;
+    	this.game = game;
     	map=new Map();
-    	j1=new Joueur("Albert",map,dimX);
-    	j2=new Joueur("Anna",map,dimX);
+    	this.hudPlay = new HudPlayController(container, game);
+    	j1=new Joueur(hudPlay.getNameJoueur1().getText(),map,dimX);
+    	j2=new Joueur(hudPlay.getNameJoueur2().getText(),map,dimX);
     	jCourant=j1;
     	j1.init();
     	j2.init();
@@ -36,7 +41,7 @@ public class Worms extends BasicGame {
     }
     
 
-    public void render(GameContainer container, Graphics g) throws SlickException {
+    public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
     	cam.render(dimX,map.getWidth(), g);
     	map.render(0, 0);
     	j1.render(g);
@@ -45,7 +50,7 @@ public class Worms extends BasicGame {
     	control.paintComponent(container, g);
     }
 
-    public void update(GameContainer container, int delta) throws SlickException {
+    public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
     	jCourant.update(delta);
     }
     
@@ -79,8 +84,32 @@ public class Worms extends BasicGame {
     	control.translate(x);
     }
 
-    public static void main(String[] args) throws SlickException {
-    	new AppGameContainer(new Worms(), dimX, dimY, false).start();
-    }
+
+	
+
+
+	
+
+	@Override
+	public int getID() {
+		// TODO Auto-generated method stub
+		return ID;
+	}
+
+
+	
+
+
+	
+
+
+	
+
+
+	
+
+
+	
 
 }
+	

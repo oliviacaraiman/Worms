@@ -15,17 +15,16 @@ public class FenetreCredits extends JFrame{
 		
 		
 		
-		this.Panel = new JPanel(new FlowLayout());
+		this.Panel = new JPanel();
 		
 		
-		setSize(400,400);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);    
+		setSize(1000,1000);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);    
 		
         
         this.setContentPane(Panel);
         
         
-        setContentPane(Panel);
         setVisible(true);
         
         
@@ -33,15 +32,14 @@ public class FenetreCredits extends JFrame{
         
         
         texte.setOpaque(true);
+        //texte.setColor(Color.WHITE)
         texte.setBackground(Color.BLACK);
-		texte.setFont(new java.awt.Font(Font.SERIF,Font.BOLD,15));
-        texte.setText("<html><body><font color='white'>Jeu développé en collaboration avec....:</body></html>");
-        Panel.setBackground(Color.BLACK);
+		texte.setFont(new java.awt.Font(Font.SERIF,Font.BOLD,50));
+        texte.setText("<html><font color='white'>Jeu développé en collaboration avec....:</font></html>");
+		Panel.setBackground(Color.BLACK);
+       
         Panel.add(texte);
-        
-        
-        
-		
+  
 		
 		}
 }
