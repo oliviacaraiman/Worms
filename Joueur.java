@@ -174,7 +174,7 @@ public class Joueur {
 				}
 			}
 			
-			if(!map.collision(futurX+LARGEUR_PERSO/2,futurY-map.getHeightTile())) { //en cours d'écriture, on peut mettre contact pour l'instant
+			if(!collision(futurX,futurY)) { //en cours d'écriture, on peut mettre contact pour l'instant
 				this.xPerso = futurX;
 				this.yPerso = futurY;
 			} else {
@@ -183,11 +183,13 @@ public class Joueur {
 		}
 	}
 	
-	public float getPourcentDistance(){
-		System.out.println("raport" + (float)distanceParcourue/DISTANCE_MAX);
-		return 1-(float)(distanceParcourue/DISTANCE_MAX);
+	public boolean collision(float futurX, float futurY){
+		if(!map.collision(futurX+LARGEUR_PERSO/2,futurY-map.getHeightTile())) { //en cours d'écriture, on peut mettre contact pour l'instant
+			return false;
+		}
+		return true;
 	}
-	
+		
 	//methode qui calcule la dist parcourue
 	public void checkDistance(){
 		if ((this.isMoving() || this.isJumping() )&& distanceParcourue<= DISTANCE_MAX){
@@ -197,11 +199,14 @@ public class Joueur {
 		if (this.isJumping() && distanceParcourue>DISTANCE_MAX){
 			this.distanceParcourue += 1;
 			setDx(0);
-	//		System.out.println("dist:" + distanceParcourue);
 		}
-		
+			
 		if (!this.isJumping() && distanceParcourue > DISTANCE_MAX) {
-				this.stopMoving();
+			setDx(0);
+			if(this.yPerso>=793.0){
+				stopMoving();
+			}
+		
 		}
 		
 }

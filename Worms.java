@@ -52,11 +52,19 @@ public class Worms extends BasicGameState /*implements GameState, Game*/{
 
     public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
     	jCourant.update(delta);
+    	if (jCourant.getDistanceParcourue() >= jCourant.DISTANCE_MAX && jCourant.grenadeLancee && !jCourant.isJumping()
+    			&& !jCourant.isMoving()){
+    		changeJoueurCourant();
+    		tnt.setIsThere(true, jCourant);
+    		
+    	}
     }
     
     public void changeJoueurCourant() {
     	controller.setJoueurCourant();
     	jCourant=controller.getJoueurCourant();
+    	jCourant.setDistanceParcourue(0);
+    	jCourant.grenadeLancee = false;
     	cam.setJoueur(jCourant);
     }
     
@@ -64,8 +72,8 @@ public class Worms extends BasicGameState /*implements GameState, Game*/{
     	controller.keyReleased(key, c);
     	if (Input.KEY_ENTER==key) {
     		jCourant.stopMoving();
-    		jCourant.setDistanceParcourue(0);
-    		jCourant.setGrenade(false);
+//    		jCourant.setDistanceParcourue(0);
+//    		jCourant.setGrenade(false);
     		this.changeJoueurCourant();
     		tnt.setIsThere(true,jCourant);
     	} else if (Input.KEY_ESCAPE==key) {
@@ -83,12 +91,6 @@ public class Worms extends BasicGameState /*implements GameState, Game*/{
     	tnt.translate(x);
     	control.translate(x);
     }
-
-
-	
-
-
-	
 
 	@Override
 	public int getID() {
