@@ -3,7 +3,7 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.GameState;
 import org.newdawn.slick.state.StateBasedGame;
 
-public class Worms extends BasicGameState /*implements GameState, Game*/{
+public class Worms extends BasicGameState{
 	private StateBasedGame game;
 	private GameContainer container;
 	private Map map;
@@ -19,7 +19,6 @@ public class Worms extends BasicGameState /*implements GameState, Game*/{
 	private ControlHud control;
 	private Camera cam;
 	private HudPlayController hudPlay;
-	
 	
 
 
@@ -56,8 +55,18 @@ public class Worms extends BasicGameState /*implements GameState, Game*/{
     			&& !jCourant.isMoving()){
     		changeJoueurCourant();
     		tnt.setIsThere(true, jCourant);
-    		
     	}
+    	if (exit()) {
+    		game.enterState(FinalScreenGameState.ID);
+    	}
+    	
+    }
+    
+    public boolean exit(){
+    	if (jCourant.isDead()) {
+    		return true;
+    	}
+    	return false;
     }
     
     public void changeJoueurCourant() {
