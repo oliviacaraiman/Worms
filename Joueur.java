@@ -9,26 +9,17 @@ public class Joueur {
 	private String nom;
 	private static int num=1;
 	private int numeroJoueur;
+	
 	//concerne le placement du personnage sur la carte
 	private Map map;
 	private Animation[] animations;
+	private final float LARGEUR_PERSO,HAUTEUR_PERSO;
+	private final float X_BEGIN,Y_BEGIN;
 	private float xPerso,yPerso;
-	private float X_BEGIN,Y_BEGIN;
 	private float dx,dy;
+	
+	//concerne les problématiques de déplacement et de gestion des tours
 	private int direction;
-	private boolean moving;
-	public final int DISTANCE_MAX=200;
-	private int distanceParcourue;
-	public boolean grenadeLancee;
-	
-	private final float LARGEUR_PERSO;
-	private final float HAUTEUR_PERSO;
-	//concerne l'affichage de la vie sur la carte
-	private Hud hud;
-	private Hud_Distance hud_distance;
-	private final float LIFE_MAX;
-	private float life;
-	
 	private boolean jumping;
 	private int JUMP_HEIGHT;
 	private boolean goingUp;
@@ -36,49 +27,74 @@ public class Joueur {
 	private int highestPoint;
 	private float gravity;
 	private float base;
+	public final int DISTANCE_MAX;
+	private int distanceParcourue;
+	public boolean grenadeLancee;
 	
+	//concerne la vie du personnage
+	private final float LIFE_MAX;
+	private float life;
+	
+	//concerne les hud
+	private Hud hud;
+	//private Hud_Distance hud_distance;
+	
+	//concerne la grenade
 	private Grenade gr;
 
-	
+	/**
+	 * Constructeur de la classe Joueur.
+	 * @param nom Le nom du personnage.
+	 * @param map La carte sur laquelle sera dessiné le personnage.
+	 * @param dimX La dimension en abscisse de la fenêtre.
+	 * @throws SlickException
+	 */
 	public Joueur(String nom,Map map,int dimX) throws SlickException {
-		//initialisation des variables simples
+		//concerne la signature du personnage
 		this.nom=nom;
+		numeroJoueur=num;
+		
+		//concerne le placement du personnage sur la carte
 		this.map=map;
-		LIFE_MAX=100;
-		life=LIFE_MAX;
-		moving=false;
+		LARGEUR_PERSO=64;
+		HAUTEUR_PERSO=128;
+		X_BEGIN=100+(num-1)*(this.map.getWidth()-200-LARGEUR_PERSO); //cette formule permet d'avoir le même écart au bord.
+		Y_BEGIN=map.f(X_BEGIN+LARGEUR_PERSO/2);
+		xPerso=X_BEGIN;
+		yPerso=Y_BEGIN;
 		dx=0;
 		dy=0;
 		
-		//différentes données à propos du saut
+		//concerne les problématiques de déplacement et de gestion des tours
+		direction=2*(num-1);
+		jumping=false;
 		JUMP_HEIGHT = 160;
 		goingUp = false;
 		goingDown = false;
 		highestPoint = 10000;
 		gravity = -.03f;
-		jumping=false;
-		
-		//différence entre les deux personnages
-		direction=2*(num-1);
-		LARGEUR_PERSO=64;
-		HAUTEUR_PERSO=128;
-		X_BEGIN=100+(num-1)*(this.map.getWidth()-200-LARGEUR_PERSO); //200 pour l'écart au bord
-		Y_BEGIN=map.f(X_BEGIN+LARGEUR_PERSO/2);//hauteur du sol
-		xPerso=X_BEGIN;
-		yPerso=Y_BEGIN;
 		base=Y_BEGIN;
+		DISTANCE_MAX=200;
+		distanceParcourue=0;
 		grenadeLancee=false;
-        
-        //Création du HUD et de la grenade;
+		
+		//concerne la vie du personnage
+		LIFE_MAX=100;
+		life=LIFE_MAX;
+		
+		//concerne les hud
         hud=new Hud(num,dimX,nom);
-        hud_distance=new Hud_Distance(num,dimX);
+        
+        //concerne la grenade
         gr=new Grenade();
         
         //Augmentation du numéro du joueur
-        numeroJoueur=num;
 		num++;
 	}
 	
+	/**
+	 * Initialise les animations du personnage.
+	 */
 	public void init() {//Chargement des animations
 		SpriteSheet face=null;
 		SpriteSheet marcheGauche0=null;
@@ -111,18 +127,25 @@ public class Joueur {
         animations[4].addFrame(sautDroite.getSprite(0, 0), 150); //saut droite
 	}
 	
+	/**
+	 * Dessine le personnage, gère les animations et dessine les hud liés au personnage.
+	 * @param g L'instance Graphics liée à la fenêtre.
+	 */
 	public void render(Graphics g) {
 		// ombre personnage
 		g.setColor(new Color(0, 0, 0, .5f));
 		g.fillOval(xPerso + 10, yPerso - 4, 45, 8);
 		// dessin du personnage animé
 		g.drawAnimation(animations[(isMoving() ? 1+(int)direction/3: 0)+(isJumping() ? (toTheLeft() ? -1-(int)direction/3+3:0)+(toTheRight() ? -1-(int)direction/3+4:0):0)], xPerso, yPerso-HAUTEUR_PERSO);
-		//dessin de la barre de vie
-		hud.paintComponent(g,this.getPourcentVie());
-		hud_distance.paintComponent(g,1 - (float)distanceParcourue/DISTANCE_MAX);
+		//dessin des barres
+		hud.paintComponent(g,this.getPourcentVie(),1 - (float)distanceParcourue/DISTANCE_MAX);
 		gr.paintComponent();
 	}
 	
+	/**
+	 * Met à jour l'animation et la position du personnage.
+	 * @param delta	Le pas de temps.
+	 */
 	public void update(int delta) {
 		// mouvement du personnage
 		checkDistance();
@@ -151,7 +174,7 @@ public class Joueur {
 				futurX=map.getWidth()-LARGEUR_PERSO;
 			}
 			if(futurY>map.getHeight()-map.getHeightTile()) {
-				futurY=map.getHeight()+1-map.getHeightTile(); //pour éviter les problèmes OutOfBounds
+				futurY=map.getHeight()+1-map.getHeightTile();
 			}
 			
 			if (jumping || goingUp || goingDown) {
@@ -174,23 +197,27 @@ public class Joueur {
 				}
 			}
 			
-			if(!collision(futurX,futurY)) { //en cours d'écriture, on peut mettre contact pour l'instant
+			if(!map.collision(futurX+LARGEUR_PERSO/2,futurY-map.getHeightTile())) {
 				this.xPerso = futurX;
 				this.yPerso = futurY;
 			} else {
-				setDy(0); //cette partie permet de corriger des bugs causés par l'ajout de la gravité
+				setDy(0);
 			}
 		}
 	}
 	
-	public boolean collision(float futurX, float futurY){
-		if(!map.collision(futurX+LARGEUR_PERSO/2,futurY-map.getHeightTile())) { //en cours d'écriture, on peut mettre contact pour l'instant
-			return false;
-		}
-		return true;
+	/**
+	 * Renvoie la fraction de distance encore parcourable ce tour.
+	 * @return Le rapport de la distance encore parcourable sur la distance totale possible en un tour.
+	 */
+	public float getPourcentDistance(){
+		System.out.println("raport" + (float)distanceParcourue/DISTANCE_MAX);
+		return 1-(float)(distanceParcourue/DISTANCE_MAX);
 	}
-		
-	//methode qui calcule la dist parcourue
+	
+	/**
+	 * Calcule la distance parcourue.
+	 */
 	public void checkDistance(){
 		if ((this.isMoving() || this.isJumping() )&& distanceParcourue<= DISTANCE_MAX){
 			this.distanceParcourue += 1;
@@ -200,17 +227,16 @@ public class Joueur {
 			this.distanceParcourue += 1;
 			setDx(0);
 		}
-			
-		if (!this.isJumping() && distanceParcourue > DISTANCE_MAX) {
-			setDx(0);
-			if(this.yPerso>=793.0){
-				stopMoving();
-			}
 		
+		if (!this.isJumping() && distanceParcourue > DISTANCE_MAX) {
+				this.stopMoving();
 		}
 		
-}
+	}
 	
+	/**
+	 * Met à jour la direction du personnage en fonction des valeurs de dx et dy.
+	 */
 	private void updateDirection() {
 		if (dx > 0 && dx >= Math.abs(dy)) {
 			direction = 3;
@@ -223,6 +249,10 @@ public class Joueur {
 		}
 	}
 	
+	/**
+	 * Modifie la valeur de dx et de dy avec la valeur de direction.
+	 * @param direction La direction du personnage.
+	 */
 	public void setDirection(int direction) { 
 		this.direction = direction;
 		switch (direction) {
@@ -234,107 +264,167 @@ public class Joueur {
 		} 
 	}
 	
+	/**
+	 * Retourne la direction du personnage.
+	 * @return La direction du personnage.
+	 */
 	public int getDirection() {
 		return direction;
 	}
 	
-	public boolean getMoving() {
-		return moving;
-	}
-	
+	/**
+	 * Retourne si le personnage est en mouvement ou pas, en fonction de la valeur de dx et de dy.
+	 * @return Le personnage est en mouvement.
+	 */
 	public boolean isMoving() {
 		return dx != 0 || dy != 0;
 	}
 	
+	/**
+	 * Modifie la valeur de jumping, représentant si le personnage saute ou non.
+	 * @param j La nouvelle valeur de jumping.
+	 */
 	public void setJumping(boolean j) {
 		this.jumping = j;
 	}
 	
+	/**
+	 * Retourne si le personnage saute ou non.
+	 * @return Le personnage saute.
+	 */
 	public boolean isJumping() {
 		return jumping;
 	}
 	
+	/**
+	 * Retourne si le personnage va à gauche ou non.
+	 * @return Le personnage va à gauche.
+	 */
 	public boolean toTheLeft(){
 		return (dx<0);
 	}
 	
+	/**
+	 * Retourne si le personnage va à droite ou non.
+	 * @return Le personnage va à droite.
+	 */
 	public boolean toTheRight(){
 		return (dx>0);
 	}
 	
+	
+	/**
+	 * Arrête le personnage.
+	 */
 	public void stopMoving() {
 		dx = 0;
 		dy = 0;
 	}
 	
-	public float getX() {
-		return xPerso;
-	}
-
-	public float getY() {
-		return yPerso;
-}
-	
-	public float getDx() {
-		return dx;
-	}
-
-	public void setDx(float dx) {
-		this.dx = dx;
-	}
-
-	public float getDy() {
-		return dy;
-	}
-
-	public void setDy(float dy) {
-		this.dy = dy;
-	}
-	
-	public int getDistanceParcourue() {
-		return distanceParcourue;
-	}
-	
-	public void setDistanceParcourue(int dist) {
-		distanceParcourue=dist;
-	}
-
-	public Animation[] getAnimations() {
-		return animations;
-	}
-	
-	public String getNom() {
-		return nom;
-	}
-	
-	public void setVie(float v) {
-		life=v;
-	}
-	
-	public float getVie() {
-		return life;
-	}
-	
-	public float getPourcentVie() {
-    	return life/LIFE_MAX;
-    }
-	
-	public void destroy(int x, int y) {
-		map.destroy(x,y,this);
-	}
-	
-	public void changeLife(int x, int y) {
-		map.changeLife(x,y,this);
-	}
-	
+	/**
+	 * Renvoie la largeur de l'image du personnage.
+	 * @return La largeur du personnage.
+	 */
 	public float getWidth() {
 		return LARGEUR_PERSO;
 	}
 	
+	/**
+	 * Renvoie la hauteur de l'image du personnage.
+	 * @return La hauteur du personnage.
+	 */
 	public float getHeight() {
 		return HAUTEUR_PERSO;
 	}
 	
+	/**
+	 * Renvoie la coordonnée en abscisse du personnage.
+	 * @return L'abscisse du personnage.
+	 */
+	public float getX() {
+		return xPerso;
+	}
+
+	/**
+	 * Renvoie la coordonnée en ordonnée du personnage.
+	 * @return L'ordonnée du personnage.
+	 */
+	public float getY() {
+		return yPerso;
+	}
+	
+	/**
+	 * Modifie la valeur du déplacement en abscisse.
+	 * @param dx La nouvelle valeur du déplacement en abscisse.
+	 */
+	public void setDx(float dx) {
+		this.dx = dx;
+	}
+	
+	/**
+	 * Modifie la valeur du déplacement en ordonnée.
+	 * @param dx La nouvelle valeur du déplacement en ordonnée.
+	 */
+	public void setDy(float dy) {
+		this.dy = dy;
+	}
+	
+	/**
+	 * Modifie la valeur de la distance parcourue.
+	 * @param dist La nouvelle distance parcourue.
+	 */
+	public void setDistanceParcourue(int dist) {
+		distanceParcourue=dist;
+	}
+	
+	/**
+	 * Renvoie le nom du personnage.
+	 * @return Le nom du personnage.
+	 */
+	public String getNom() {
+		return nom;
+	}
+	
+	/**
+	 * Modifie le nom du personnage.
+	 * @param a Le nouveau nom du personnage.
+	 */
+	public void setNom(String a) {
+		nom=a;
+		hud.setNom(nom);
+	}
+	
+	/**
+	 * Modifie la vie actuelle du personnage.
+	 * @param l La nouvelle valeur de la vie du personnage.
+	 */
+	public void setVie(float l) {
+		life=l;
+	}
+	
+	/**
+	 * Renvoie la vie actuelle du personnage.
+	 * @return La vie du personnage.
+	 */
+	public float getVie() {
+		return life;
+	}
+	
+	/**
+	 * Renvoie la fraction de vie restante.
+	 * @return Le rapport de la vie restante et de la vie maximum.
+	 */
+	public float getPourcentVie() {
+    	return life/LIFE_MAX;
+    }
+	
+	/**
+	 * Calcule la trajectoire de la grenade, la dessine et renvoie les coordonnées du point d'explosion.
+	 * @param a L'angle de lancer en degrés.
+	 * @param f La vitesse initiale (minimum de 15, maximum conseillé 175).
+	 * @param direct La direction (0 à gauche,1 à droite).
+	 * @return La position du point d'explosion.
+	 */
 	public float[] lancerGrenade(float a, float f,int direct) { //attention, diminution de y vers le haut, donc force<0 et g>0 et - devant la tangente
 		float pas=(float)(-a/10+11); //dépend de l'angle
 		float angle =(float)(a*2*Math.PI/360) ; //a en degré, angle en radians
@@ -384,12 +474,38 @@ public class Joueur {
 		return finale;	
 	}
 	
-	public void translateHud(int x) {
-		hud.translate(x);
-		hud_distance.translate(x);
+	/**
+	 * Modifie si la grenade a été lancée ce tour ou non.
+	 * @param b La grenade a été lancée.
+	 */
+	public void setGrenade(boolean b) {
+		grenadeLancee=b;
 	}
 	
-	public void setGrenade(boolean b) {
-		grenadeLancee=false;
+	/**
+	 * Appelle la méthode destroy de Map.
+	 * @param x L'abscisse du point d'explosion de la grenade.
+	 * @param y L'ordonnée du point d'explosion de la grenade.
+	 */
+	public void destroy(int x, int y) {
+		map.destroy(x,y);
+	}
+	
+	/**
+	 * Appelle la méthode changeLife de Map pour ce Joueur.
+	 * @param x L'abscisse du point d'explosion de la grenade.
+	 * @param y L'ordonnée du point d'explosion de la grenade.
+	 */
+	public void changeLife(int x, int y) {
+		map.changeLife(x,y,this);
+	}
+	
+	/**
+	 * Translate les hud liés au Joueur à une certaine valeur sur l'axe des abscisses.
+	 * @param x La valeur à laquelle les huds sont translatés.
+	 */
+	public void translateHud(int x) {
+		hud.translate(x);
+		//hud_distance.translate(x);
 	}
 }

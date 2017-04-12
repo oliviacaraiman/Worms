@@ -6,35 +6,46 @@ public class ControlPlayer implements KeyListener {
 	private Joueur playerSuivant;
 	private ControlHud control;
 	
+	/**
+	 * Constructeur de la classe ControlPlayer, permettant de gérer la réponse aux entrées clavier.
+	 * @param playerC Le joueur courant.
+	 * @param playerS Le joueur suivant.
+	 * @param cont Le ControlHud du jeu.
+	 */
 	public ControlPlayer(Joueur playerC,Joueur playerS,ControlHud cont){
 		this.playerCourant = playerC;
 		this.playerSuivant = playerS;
 		control=cont;
 	}
 	
+	/**
+	 * Change le joueur courant.
+	 */
 	public void setJoueurCourant() {
 		Joueur j =playerCourant;
 		playerCourant=playerSuivant;
 		playerSuivant=j;
 	}
 	
+	/**
+	 * Renvoie le joueur courant.
+	 * @return Le joueur courant.
+	 */
 	public Joueur getJoueurCourant() {
 		return playerCourant;
 	}
 
-	public void inputEnded() {
-	}
+	public void inputEnded() {}
 
-	public void inputStarted() {
-	}
+	public void inputStarted() {}
 
-	public boolean isAcceptingInput() {
-		return false;
-	}
+	public boolean isAcceptingInput() {return false;}
 
-	public void setInput(Input arg0) {
-	}
-
+	public void setInput(Input arg0) {}
+	
+	/**
+	 * Gère la réaction aux entrées clavier (touches directionnelles et touche D).
+	 */
 	public void keyPressed(int key, char c) {
 		switch (key) {
         case Input.KEY_UP:   
@@ -61,6 +72,9 @@ public class ControlPlayer implements KeyListener {
 		}
 	}
 
+	/**
+	 * Gère le relâchement des touches du clavier (arrêt du joueur).
+	 */
 	public void keyReleased(int key, char c) {
 		switch (key) {
 			case Input.KEY_DOWN:  playerCourant.setDy(0); break;

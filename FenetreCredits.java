@@ -1,55 +1,35 @@
-
 import java.awt.*;
 import javax.swing.*;
-import java.awt.event.*;
-import java.util.*;
-
 
 public class FenetreCredits extends JFrame{
 	
 	private JPanel Panel;
 	private JTextArea texte = new JTextArea("Credits");
 	
-	
+	/**
+	 * Constructeur de la classe FenetreCredits, qui affiche les crédits du jeu.
+	 */
 	public FenetreCredits(){
-		
-		
-		
 		this.Panel = new JPanel();
-		
-		
 		setSize(1000,1000);
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);    
-		
-        
-        this.setContentPane(Panel);
-        
-        
-        setVisible(true);
-        
-        
-     
-        
-        
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+      
         texte.setOpaque(true);
-        //texte.setColor(Color.WHITE)
         texte.setBackground(Color.BLACK);
         texte.setEditable(false);
-		//texte.setFont(new java.awt.Font(Font.SERIF,Font.BOLD,50));
         texte.setForeground(Color.WHITE);
-		texte.setFont(new Font("Marker Felt", Font.BOLD, 35));
-        texte.setText("Jeu dÃ©veloppÃ© par: "
+        texte.setFont(new Font("Marker Felt",Font.BOLD,35));
+        texte.setText("Jeu développé par: "
         		+ "\n" + "Boriasse Louis"
         		+ "\n" + "Caraiman Olivia"
         		+ "\n" + "Legendre Julien"
         		+ "\n" + "Slimani Sara"
-        		+ "\n" + "CrÃ©Ã© Ã  l'aide de la  bibiliothÃ¨que Slick 2D."
-        		+ "\n"+ "Il s'agit d'un jeu dÃ©stinÃ© Ã  un usage interne (INSA Lyon)");
+        		+ "\n" + "Créé à l'aide de la  bibiliothèque Slick 2D."
++ "\n"+ "Il s'agit d'un jeu déstiné à un usage interne (INSA Lyon)");
 		Panel.setBackground(Color.BLACK);
-       
-        Panel.add(texte);
-  
 		
-		}
+        Panel.add(texte);
+		this.setContentPane(Panel);
+        setVisible(true);  
+	}
 }
-

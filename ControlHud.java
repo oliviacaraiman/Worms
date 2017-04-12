@@ -22,6 +22,11 @@ public class ControlHud implements ComponentListener {
 	private int direction;
 	private int xTranslate;
 	
+	/**
+	 * Constructeur de la classe ControlHud, permettant de personnaliser le lancer de grenade.
+	 * @param container Le GameContainer du jeu.
+	 * @param xDim La dimension en abscisse de la fenêtre.
+	 */
 	public ControlHud(GameContainer container,float xDim) {
 		HEIGHT=10;
 		HEIGHT_TEXT=30;
@@ -48,8 +53,13 @@ public class ControlHud implements ComponentListener {
 		direction=1; //droite
 	}
 	
+	/**
+	 * Dessine les différents éléments du Hud.
+	 * @param container Le GameContainer du jeu.
+	 * @param g L'instance Graphics liée à la fenêtre.
+	 */
 	public void paintComponent(GameContainer container,Graphics g) {
-		g.translate(-xTranslate, 0); //permet au ControlHud de se déplacer avec la caméra
+		g.translate(-xTranslate, 0); //permet au ControlHud de se déplacer correctement avec la caméra. Il y a sinon un décalage entre l'image des éléments (boutons par ex.) et leur vraie position (zone de clic).
 		g.setColor(Color.black);
 		g.setFont(font);
 		leftButton.render(container, g);
@@ -60,19 +70,39 @@ public class ControlHud implements ComponentListener {
 		angleJet.render(container, g);
 	}
 	
+	/**
+	 * Renvoie la vitesse de lancer de la grenade, en écartant les valeurs non souhaitées.
+	 * @return La vitesse de la grenade.
+	 */
 	public int getPuissance() {
 		int p;
-		if(puissanceJet.getText().isEmpty()) {
-			p=30;
+		boolean isNumber=true;
+		try {
+			Integer.parseInt(puissanceJet.getText());
+		} catch (Exception e) {
+			isNumber=false;
+		}
+		if(!isNumber || Integer.parseInt(puissanceJet.getText())<=15) {
+			p=15;
 		} else {
 			p=Integer.parseInt(puissanceJet.getText());
 		}
 		return p;
 	}
 	
+	/**
+	 * Renvoie l'angle de lancer de la grenade, en écartant les valeurs non souhaitées.
+	 * @return L'angle de la grenade.
+	 */
 	public int getAngle() {
 		int a;
-		if(angleJet.getText().isEmpty()) {
+		boolean isNumber=true;
+		try {
+			Integer.parseInt(angleJet.getText());
+		} catch (Exception e) {
+			isNumber=false;
+		}
+		if(!isNumber || Integer.parseInt(angleJet.getText())<0 || Integer.parseInt(angleJet.getText())>85) {
 			a=80;
 		} else {
 			a=Integer.parseInt(angleJet.getText());
@@ -80,6 +110,9 @@ public class ControlHud implements ComponentListener {
 		return a;
 	}
 
+	/**
+	 * Réagit au clic sur les boutons.
+	 */
 	public void componentActivated(AbstractComponent arg0) {
 		if(arg0==leftButton) {
 			imleft.setAlpha(1);
@@ -92,10 +125,18 @@ public class ControlHud implements ComponentListener {
 		}
 	}
 	
+	/**
+	 * Renvoie la direction de lancer de la grenade.
+	 * @return La direction de lancer de la grenade.
+	 */
 	public int getDirection() {
 		return direction;
 	}
 	
+	/**
+	 * Translate les différents éléments du hud à une certaine abscisse.
+	 * @param x L'abscisse à laquelle les éléments sont translatés.
+	 */
 	public void translate(int x) {
 		xTranslate=x;
 	}
