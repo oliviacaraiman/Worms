@@ -19,13 +19,15 @@ public class FenetreCredits extends JFrame{
         texte.setEditable(false);
         texte.setForeground(Color.WHITE);
         texte.setFont(new Font("Marker Felt",Font.BOLD,35));
-        texte.setText("Jeu développé par: "
+        texte.setText("\n" +""+"\n" +"Jeu développé par: "
         		+ "\n" + "Boriasse Louis"
         		+ "\n" + "Caraiman Olivia"
         		+ "\n" + "Legendre Julien"
         		+ "\n" + "Slimani Sara"
+        		+ "\n" + ""
         		+ "\n" + "Créé à l'aide de la  bibiliothèque Slick 2D."
-+ "\n"+ "Il s'agit d'un jeu déstiné à un usage interne (INSA Lyon)");
+        		+ "\n" + ""
+        		+ "\n" + "Il s'agit d'un jeu déstiné à un usage interne (INSA Lyon)");
 		Panel.setBackground(Color.BLACK);
 		
         Panel.add(texte);
