@@ -12,29 +12,55 @@ public class FinalScreenGameState extends BasicGameState {
 
 	public static final int ID = 3;
 	private StateBasedGame game;
-	private StateGame myGame;
 	private GameOver gameOverScreen; 
 	private Worms worms;
 	public String nomGagnant;
 	public String nomPerdant;
 	
-	public FinalScreenGameState(){
-		this.nomGagnant = nomGagnant;
-		this.nomPerdant = nomPerdant;
+	/**
+	 * Constructeur de la classe
+	 * @param w : la classe Worms a laquelle cette classe est associee
+	 */
+	public FinalScreenGameState(Worms w){
+		this.worms = w;
 	}
 
+	/**
+	 * initialise la fenetre GameOver.
+	 */
 	public void init(GameContainer container, StateBasedGame game) throws SlickException {
 		this.game = game;
-		gameOverScreen = new GameOver(container, game);
+		gameOverScreen = new GameOver(container, game,this);
 	}
 
 	public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
 		gameOverScreen.paintComponent(container, game, g);
-		
 	}
 
-	public void update(GameContainer arg0, StateBasedGame arg1, int arg2) throws SlickException {
+	/**
+	 * met a jour les noms des personnages(gagnant/perdant)
+	 */
+	public void update(GameContainer container, StateBasedGame game, int arg2) throws SlickException {
+		this.nomPerdant = worms.nomPerdant;
+		this.nomGagnant = worms.nomGagnant;
+		gameOverScreen.setNomGagnant(nomGagnant);
+		gameOverScreen.setNomPerdant(nomPerdant);
 	}
+	
+	
+	public void setNomGagnant(String nom){
+		nomGagnant = nom;
+	}
+	public void setNomPerdant(String nom){
+		nomPerdant = nom;
+	}
+	public String getNomGagnant(){
+		return nomGagnant;
+	}
+	public String getNomPerdant(){
+		return nomPerdant;
+	}
+	
 
 	@Override
 	public int getID() {
