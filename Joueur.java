@@ -18,7 +18,7 @@ public class Joueur {
 	private float xPerso,yPerso;
 	private float dx,dy;
 	
-	//concerne les problématiques de déplacement et de gestion des tours
+	//concerne les problÃ©matiques de dÃ©placement et de gestion des tours
 	private int direction;
 	private boolean jumping;
 	private int JUMP_HEIGHT;
@@ -45,8 +45,8 @@ public class Joueur {
 	/**
 	 * Constructeur de la classe Joueur.
 	 * @param nom Le nom du personnage.
-	 * @param map La carte sur laquelle sera dessiné le personnage.
-	 * @param dimX La dimension en abscisse de la fenêtre.
+	 * @param map La carte sur laquelle sera dessinÃ© le personnage.
+	 * @param dimX La dimension en abscisse de la fenÃªtre.
 	 * @throws SlickException
 	 */
 	public Joueur(String nom,Map map,int dimX) throws SlickException {
@@ -58,14 +58,14 @@ public class Joueur {
 		this.map=map;
 		LARGEUR_PERSO=64;
 		HAUTEUR_PERSO=128;
-		X_BEGIN=100+(num-1)*(this.map.getWidth()-200-LARGEUR_PERSO); //cette formule permet d'avoir le même écart au bord.
+		X_BEGIN=100+(num-1)*(this.map.getWidth()-200-LARGEUR_PERSO); //cette formule permet d'avoir le mÃªme Ã©cart au bord.
 		Y_BEGIN=map.f(X_BEGIN+LARGEUR_PERSO/2);
 		xPerso=X_BEGIN;
 		yPerso=Y_BEGIN;
 		dx=0;
 		dy=0;
 		
-		//concerne les problématiques de déplacement et de gestion des tours
+		//concerne les problÃ©matiques de dÃ©placement et de gestion des tours
 		direction=2*(num-1);
 		jumping=false;
 		JUMP_HEIGHT = 160;
@@ -88,7 +88,7 @@ public class Joueur {
         //concerne la grenade
         gr=new Grenade();
         
-        //Augmentation du numéro du joueur
+        //Augmentation du numÃ©ro du joueur
 		num++;
 	}
 	
@@ -128,14 +128,14 @@ public class Joueur {
 	}
 	
 	/**
-	 * Dessine le personnage, gère les animations et dessine les hud liés au personnage.
-	 * @param g L'instance Graphics liée à la fenêtre.
+	 * Dessine le personnage, gÃ¨re les animations et dessine les hud liÃ©s au personnage.
+	 * @param g L'instance Graphics liÃ©e Ã  la fenÃªtre.
 	 */
 	public void render(Graphics g) {
 		// ombre personnage
 		g.setColor(new Color(0, 0, 0, .5f));
 		g.fillOval(xPerso + 10, yPerso - 4, 45, 8);
-		// dessin du personnage animé
+		// dessin du personnage animÃ©
 		g.drawAnimation(animations[(isMoving() ? 1+(int)direction/3: 0)+(isJumping() ? (toTheLeft() ? -1-(int)direction/3+3:0)+(toTheRight() ? -1-(int)direction/3+4:0):0)], xPerso, yPerso-HAUTEUR_PERSO);
 		//dessin des barres
 		hud.paintComponent(g,this.getPourcentVie(),1 - (float)distanceParcourue/DISTANCE_MAX);
@@ -143,7 +143,7 @@ public class Joueur {
 	}
 	
 	/**
-	 * Met à jour l'animation et la position du personnage.
+	 * Met Ã  jour l'animation et la position du personnage.
 	 * @param delta	Le pas de temps.
 	 */
 	public void update(int delta) {
@@ -157,13 +157,13 @@ public class Joueur {
 			
 			if(!jumping) {
 				base=yPerso;
-				if(!map.collision(futurX+LARGEUR_PERSO/2,futurY)) { //pas la même condition pour avoir une certaine "marge"
+				if(!map.collision(futurX+LARGEUR_PERSO/2,futurY)) { //pas la mÃªme condition pour avoir une certaine "marge"
 					dy=-16*gravity;
 					futurY=this.yPerso + .3f * delta * dy;
 				}
 			}
 			
-			//conditions de sortie d'écran
+			//conditions de sortie d'Ã©cran
 			if(futurX<0) {
 				futurX=0;
 			}
@@ -229,13 +229,13 @@ public class Joueur {
 		}
 		
 		if (!this.isJumping() && distanceParcourue > DISTANCE_MAX) {
-				this.stopMoving();
+			setDx(0);
 		}
 		
 	}
 	
 	/**
-	 * Met à jour la direction du personnage en fonction des valeurs de dx et dy.
+	 * Met Ã  jour la direction du personnage en fonction des valeurs de dx et dy.
 	 */
 	private void updateDirection() {
 		if (dx > 0 && dx >= Math.abs(dy)) {
@@ -281,7 +281,7 @@ public class Joueur {
 	}
 	
 	/**
-	 * Modifie la valeur de jumping, représentant si le personnage saute ou non.
+	 * Modifie la valeur de jumping, reprÃ©sentant si le personnage saute ou non.
 	 * @param j La nouvelle valeur de jumping.
 	 */
 	public void setJumping(boolean j) {
@@ -297,16 +297,16 @@ public class Joueur {
 	}
 	
 	/**
-	 * Retourne si le personnage va à gauche ou non.
-	 * @return Le personnage va à gauche.
+	 * Retourne si le personnage va Ã  gauche ou non.
+	 * @return Le personnage va Ã  gauche.
 	 */
 	public boolean toTheLeft(){
 		return (dx<0);
 	}
 	
 	/**
-	 * Retourne si le personnage va à droite ou non.
-	 * @return Le personnage va à droite.
+	 * Retourne si le personnage va Ã  droite ou non.
+	 * @return Le personnage va Ã  droite.
 	 */
 	public boolean toTheRight(){
 		return (dx>0);
@@ -314,7 +314,7 @@ public class Joueur {
 	
 	
 	/**
-	 * Arrête le personnage.
+	 * ArrÃªte le personnage.
 	 */
 	public void stopMoving() {
 		dx = 0;
@@ -338,7 +338,7 @@ public class Joueur {
 	}
 	
 	/**
-	 * Renvoie la coordonnée en abscisse du personnage.
+	 * Renvoie la coordonnÃ©e en abscisse du personnage.
 	 * @return L'abscisse du personnage.
 	 */
 	public float getX() {
@@ -346,24 +346,24 @@ public class Joueur {
 	}
 
 	/**
-	 * Renvoie la coordonnée en ordonnée du personnage.
-	 * @return L'ordonnée du personnage.
+	 * Renvoie la coordonnÃ©e en ordonnÃ©e du personnage.
+	 * @return L'ordonnÃ©e du personnage.
 	 */
 	public float getY() {
 		return yPerso;
 	}
 	
 	/**
-	 * Modifie la valeur du déplacement en abscisse.
-	 * @param dx La nouvelle valeur du déplacement en abscisse.
+	 * Modifie la valeur du dÃ©placement en abscisse.
+	 * @param dx La nouvelle valeur du dÃ©placement en abscisse.
 	 */
 	public void setDx(float dx) {
 		this.dx = dx;
 	}
 	
 	/**
-	 * Modifie la valeur du déplacement en ordonnée.
-	 * @param dx La nouvelle valeur du déplacement en ordonnée.
+	 * Modifie la valeur du dÃ©placement en ordonnÃ©e.
+	 * @param dx La nouvelle valeur du dÃ©placement en ordonnÃ©e.
 	 */
 	public void setDy(float dy) {
 		this.dy = dy;
@@ -419,45 +419,45 @@ public class Joueur {
     }
 	
 	/**
-	 * Calcule la trajectoire de la grenade, la dessine et renvoie les coordonnées du point d'explosion.
-	 * @param a L'angle de lancer en degrés.
-	 * @param f La vitesse initiale (minimum de 15, maximum conseillé 175).
-	 * @param direct La direction (0 à gauche,1 à droite).
+	 * Calcule la trajectoire de la grenade, la dessine et renvoie les coordonnÃ©es du point d'explosion.
+	 * @param a L'angle de lancer en degrÃ©s.
+	 * @param f La vitesse initiale (minimum de 15, maximum conseillÃ© 175).
+	 * @param direct La direction (0 Ã  gauche,1 Ã  droite).
 	 * @return La position du point d'explosion.
 	 */
 	public float[] lancerGrenade(float a, float f,int direct) { //attention, diminution de y vers le haut, donc force<0 et g>0 et - devant la tangente
-		float pas=(float)(-a/10+11); //dépend de l'angle
-		float angle =(float)(a*2*Math.PI/360) ; //a en degré, angle en radians
+		float pas=(float)(-a/10+11); //dÃ©pend de l'angle
+		float angle =(float)(a*2*Math.PI/360) ; //a en degrÃ©, angle en radians
 		float force = -f ;
 		int dir=direct;
 		ArrayList<Float> traj=new ArrayList<Float>();
 		
-		float x0=(float)(xPerso+LARGEUR_PERSO/2);//valeur de départ de x
-		float y0=(float)(yPerso-LARGEUR_PERSO/4);//valeur de départ de y, au milieu du corps du perso
+		float x0=(float)(xPerso+LARGEUR_PERSO/2);//valeur de dÃ©part de x
+		float y0=(float)(yPerso-LARGEUR_PERSO/4);//valeur de dÃ©part de y, au milieu du corps du perso
 		gr.setPosition(x0,y0);
 		gr.setIsThere(true);
 		
-		traj.add(yPerso); //première valeur de y
+		traj.add(yPerso); //premiÃ¨re valeur de y
 		float x;
 		if(dir==1) {
 			x=(float)(x0+pas);
-		} else { //tir à gauche
+		} else { //tir Ã  gauche
 			x=(float)(x0-pas);
 			angle=-angle+(float)Math.PI;
 		}
-		float y =(float)(((10*Math.pow(x-x0,2))/(2*Math.pow(force,2)))*(1+Math.pow(Math.tan(angle),2)) - (x-x0)*Math.tan(angle)+y0); //1ere itération
-		while(x>pas && x<map.getWidth()-pas && y>pas && y<map.getHeight()-pas && !map.collision(x, y)) { //ne pas faire les tests si sortie d'écran
-			traj.add(y);//ajout du précédent
+		float y =(float)(((10*Math.pow(x-x0,2))/(2*Math.pow(force,2)))*(1+Math.pow(Math.tan(angle),2)) - (x-x0)*Math.tan(angle)+y0); //1ere itÃ©ration
+		while(x>pas && x<map.getWidth()-pas && y>pas && y<map.getHeight()-pas && !map.collision(x, y)) { //ne pas faire les tests si sortie d'Ã©cran
+			traj.add(y);//ajout du prÃ©cÃ©dent
 			if(dir==1) {
 				x=(float)(x+pas);
-			} else { //tir à gauche
+			} else { //tir Ã  gauche
 				x=(float)(x-pas);
 			}
 			y =(float)(((10*Math.pow(x-x0,2))/(2*Math.pow(force,2)))*(1+Math.pow(Math.tan(angle),2)) - (x-x0)*Math.tan(angle)+y0);
 			gr.setPosition(x,y);
 		}
 		
-		float[] finale={(int)x/map.getWidthTile(),(int)(y+1)/map.getWidthTile()}; //+1 car on s'arrête juste avant l'entier
+		float[] finale={(int)x/map.getWidthTile(),(int)(y+1)/map.getWidthTile()}; //+1 car on s'arrÃªte juste avant l'entier
 		final int xLand = (int)x/map.getWidthTile();
 		final int yLand = (int)(y+1)/map.getWidthTile();
 		//timer pour dessiner le trou au bon moment
@@ -475,34 +475,34 @@ public class Joueur {
 	}
 	
 	/**
-	 * Modifie si la grenade a été lancée ce tour ou non.
-	 * @param b La grenade a été lancée.
+	 * Modifie si la grenade a Ã©tÃ© lancÃ©e ce tour ou non.
+	 * @param b La grenade a Ã©tÃ© lancÃ©e.
 	 */
 	public void setGrenade(boolean b) {
 		grenadeLancee=b;
 	}
 	
 	/**
-	 * Appelle la méthode destroy de Map.
+	 * Appelle la mÃ©thode destroy de Map.
 	 * @param x L'abscisse du point d'explosion de la grenade.
-	 * @param y L'ordonnée du point d'explosion de la grenade.
+	 * @param y L'ordonnÃ©e du point d'explosion de la grenade.
 	 */
 	public void destroy(int x, int y) {
 		map.destroy(x,y);
 	}
 	
 	/**
-	 * Appelle la méthode changeLife de Map pour ce Joueur.
+	 * Appelle la mÃ©thode changeLife de Map pour ce Joueur.
 	 * @param x L'abscisse du point d'explosion de la grenade.
-	 * @param y L'ordonnée du point d'explosion de la grenade.
+	 * @param y L'ordonnÃ©e du point d'explosion de la grenade.
 	 */
 	public void changeLife(int x, int y) {
 		map.changeLife(x,y,this);
 	}
 	
 	/**
-	 * Translate les hud liés au Joueur à une certaine valeur sur l'axe des abscisses.
-	 * @param x La valeur à laquelle les huds sont translatés.
+	 * Translate les hud liÃ©s au Joueur Ã  une certaine valeur sur l'axe des abscisses.
+	 * @param x La valeur Ã  laquelle les huds sont translatÃ©s.
 	 */
 	public void translateHud(int x) {
 		hud.translate(x);
