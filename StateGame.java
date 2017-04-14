@@ -1,39 +1,33 @@
 import org.newdawn.slick.*;
 import org.newdawn.slick.state.StateBasedGame;
 
+
 public class StateGame extends StateBasedGame {
 	
-	public String nomGagnant;
-	public String nomPerdant;
-	private static int dimX =1440;
-	private static int dimY = 800;
-
-	public static void main(String[] args) throws SlickException {
-		new AppGameContainer(new StateGame(), 1440, 800, false).start();
-	}
-
+	private static int dimX;
+	private static int dimY;
+	
+	/**
+	 * Constructeur de la classe StateGame, qui gère les différentes phases de jeu.
+	 * Il définit le titre et les dimensions de la fenêtre de jeu.
+	 */
 	public StateGame() {
 		super("Worms");
+		dimX=1440;
+		dimY=800;
 	}
-
-	@Override
+	
+	/**
+	 * Ajoute les différentes phases de jeu à l'instance courante.
+	 */
 	public void initStatesList(GameContainer container) throws SlickException {
-		Worms w=new Worms(dimX,dimY);
-	    this.addState(new MainScreenGameState(w));
-	    this.addState(w); 
-	    this.addState(new FinalScreenGameState(w));
+		Worms m=new Worms(dimX,dimY);
+	    this.addState(new MainScreenGameState(m));
+	    this.addState(m); 
+	    this.addState(new FinalScreenGameState(m));
 	}
 
-	public String getNomGagnant() {
-		return nomGagnant;
-	}
-
-	public String getNomPerdant() {
-		return nomPerdant;
-	}
-
-	public void setNoms(String nom1, String nom2){
-		nomGagnant = nom1;
-		nomPerdant = nom2;
+	public static void main(String[]args) throws SlickException {
+		new AppGameContainer(new StateGame(),dimX,dimY, false).start();
 	}
 }

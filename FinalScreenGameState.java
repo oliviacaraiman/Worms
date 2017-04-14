@@ -1,35 +1,29 @@
 import org.newdawn.slick.*;
-import org.newdawn.slick.command.Control;
-import org.newdawn.slick.command.InputProvider;
-import org.newdawn.slick.gui.AbstractComponent;
-import org.newdawn.slick.gui.ComponentListener;
-import org.newdawn.slick.*;
-
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 public class FinalScreenGameState extends BasicGameState {
 
 	public static final int ID = 3;
-	private StateBasedGame game;
 	private GameOver gameOverScreen; 
 	private Worms worms;
 	public String nomGagnant;
 	public String nomPerdant;
+	private GameContainer container;
 	
 	/**
-	 * Constructeur de la classe
-	 * @param w : la classe Worms a laquelle cette classe est associee
+	 * Constructeur de la classe FinalScreenGameState.
+	 * @param w La classe Worms a laquelle cette classe est associee.
 	 */
 	public FinalScreenGameState(Worms w){
 		this.worms = w;
 	}
 
 	/**
-	 * initialise la fenetre GameOver.
+	 * Initialise la fenetre GameOver.
 	 */
 	public void init(GameContainer container, StateBasedGame game) throws SlickException {
-		this.game = game;
+		this.container=container;
 		gameOverScreen = new GameOver(container, game,this);
 	}
 
@@ -38,7 +32,7 @@ public class FinalScreenGameState extends BasicGameState {
 	}
 
 	/**
-	 * met a jour les noms des personnages(gagnant/perdant)
+	 * Met a jour les noms des personnages(gagnant/perdant).
 	 */
 	public void update(GameContainer container, StateBasedGame game, int arg2) throws SlickException {
 		this.nomPerdant = worms.nomPerdant;
@@ -47,23 +41,36 @@ public class FinalScreenGameState extends BasicGameState {
 		gameOverScreen.setNomPerdant(nomPerdant);
 	}
 	
+	/**
+	 * Réagit à la pression des touches.
+	 * L'appui sur ECHAP quitte le jeu.
+	 */
+	public void keyPressed(int key, char c) {
+		if (Input.KEY_ESCAPE==key) {
+            container.exit();
+        }
+    }
 	
-	public void setNomGagnant(String nom){
-		nomGagnant = nom;
-	}
-	public void setNomPerdant(String nom){
-		nomPerdant = nom;
-	}
+	/**
+	 * Retourne le nom du joueur gagnant.
+	 * @return Le nom du joueur gagnant.
+	 */
 	public String getNomGagnant(){
 		return nomGagnant;
 	}
+	/**
+	 * Retourne le nom du joueur perdant.
+	 * @return Le nom du joueur perdant.
+	 */
 	public String getNomPerdant(){
 		return nomPerdant;
 	}
 	
-
-	@Override
+	/**
+     * Retourne l'identifiant de la phase pour la classe.
+     * @return L'identifiant de la classe FinalScreenGameState.
+     */
 	public int getID() {
 		return ID;
-	};
+	}
 }

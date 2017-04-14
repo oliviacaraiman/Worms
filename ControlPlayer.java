@@ -1,10 +1,10 @@
-import org.newdawn.slick.Input;
-import org.newdawn.slick.KeyListener;
+import org.newdawn.slick.*;
 
 public class ControlPlayer implements KeyListener {
 	private Joueur playerCourant;
 	private Joueur playerSuivant;
 	private ControlHud control;
+	private Sound jump;
 	
 	/**
 	 * Constructeur de la classe ControlPlayer, permettant de gérer la réponse aux entrées clavier.
@@ -16,6 +16,11 @@ public class ControlPlayer implements KeyListener {
 		this.playerCourant = playerC;
 		this.playerSuivant = playerS;
 		control=cont;
+		try {
+	    	jump=new Sound("src/main/ressources/Musique/jump.ogg");
+		}catch(Exception e) {
+			
+		}
 	}
 	
 	/**
@@ -51,6 +56,7 @@ public class ControlPlayer implements KeyListener {
         case Input.KEY_UP:   
         	playerCourant.setDy(-0.3f);
         	playerCourant.setJumping(true);
+        	jump.play();
 			break;
 		case Input.KEY_LEFT:
 			playerCourant.setDx(-0.5f);

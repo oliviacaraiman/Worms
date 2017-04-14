@@ -9,6 +9,7 @@ public class MainScreenGameState extends BasicGameState {
 	  private Image background;
 	  private HudPlayController hudMenu;
 	  private Worms w;
+	  private Music theme;
 	  
 	  /**
 	   * Constructeur de la classe MainScreenGameState, qui correspond à la phase de menu de début de jeu.
@@ -25,9 +26,11 @@ public class MainScreenGameState extends BasicGameState {
 	   */
 	  public void init(GameContainer container, StateBasedGame game) {
 		  try {
-			    this.background =  new Image("src/main/ressources/menu/Fond2.jpeg");
+			    background =  new Image("src/main/ressources/menu/Fond2.jpeg");
+			    theme=new Music("src/main/ressources/Musique/theme.ogg");
 		  } catch (Exception e) {}
 		  hudMenu = new HudPlayController(container,game,w); 
+		  theme.loop();
 	  }
 	  
 	  /**
@@ -55,5 +58,5 @@ public class MainScreenGameState extends BasicGameState {
 	   */
 	  public int getID() {
 	    return ID;
-	  }	  
+	  }
 }

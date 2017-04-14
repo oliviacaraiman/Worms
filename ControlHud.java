@@ -140,4 +140,12 @@ public class ControlHud implements ComponentListener {
 	public void translate(int x) {
 		xTranslate=x;
 	}
+	
+	/**
+	 * Vide les zones de texte.
+	 */
+	public void emptyTextField() {
+		puissanceJet.setText("");
+		angleJet.setText("");
+	}
 }
